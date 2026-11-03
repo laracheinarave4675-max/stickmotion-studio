@@ -1,0 +1,70 @@
+name: Render StickMotion 60-second MP4 pilot
+on:
+  workflow_dispatch:
+    inputs:
+      narration:
+        description: English narration for a short pilot (1–1,800 characters; keep near 60 seconds)
+        required: true
+        type: string
+      voice:
+        description: Gemini documentary narrator
+        required: true
+        default: Charon
+        type: choice
+        options:
+          - Charon
+          - Iapetus
+          - Rasalgethi
+permissions:
+  contents: read
+  actions: read
+jobs:
+  render:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up Python and Node
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Install renderer dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ffmpeg
+          python -m pip install --disable-pip-version-check pillow google-genai
+      - name: Validate and save narration
+        env:
+          NARRATION: ${{ inputs.narration }}
+        run: |
+          python - <<'PY'
+          import os
+          from pathlib import Path
+          text=os.environ.get("NARRATION","").strip()
+          if not text or len(text)>1800:
+              raise SystemExit(f"Pilot narration must be 1–1,800 characters; got {len(text)}.")
+          Path("output").mkdir(exist_ok=True)
+          Path("output/narration.txt").write_text(text,encoding="utf-8")
+          PY
+      - name: Generate Charon narration
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: |
+          python scripts/generate_gemini_voice.py --input output/narration.txt --output output/narration.wav --voice "${{ inputs.voice }}" --style "Measured, warm, authoritative documentary narration. Natural pacing, clear articulation, restrained emotion. Avoid an exaggerated announcer style." --model gemini-2.5-flash-preview-tts
+      - name: Render animated MP4 with subtitles
+        run: python scripts/render_video.py --narration output/narration.txt --voice output/narration.wav --output output/stickmotion-pilot.mp4
+      - name: Upload MP4, SRT and render metadata
+        uses: actions/upload-artifact@v4
+        with:
+          name: stickmotion-mp4-pilot
+          path: |
+            output/stickmotion-pilot.mp4
+            output/stickmotion-pilot.srt
+            output/stickmotion-pilot.json
+            output/narration.wav
+            output/narration.txt
+          retention-days: 3
