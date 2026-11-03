@@ -1,5 +1,5 @@
 const VISUAL_ORDER = [
-  ["space", /\b(space|universe|galaxy|planet|star|moon|mars|earth|cosmos|orbit|astronomical)\b/],
+  ["space", /\b(space|universe|galaxy|planets?|stars?|moons?|mars|earth|cosmos|orbits?|astronomical)\b/],
   ["night", /\b(dark|darkness|night|shadow|afraid|fear|scared|haunted|lights? (?:go|went) out)\b/],
   ["clock", /\b(time|clock|second|minute|hour|year|century|future|past|history|ancient|era)\b/],
   ["conversation", /\b(talk|talking|conversation|together|friend|people|someone|they|she|he|argue|discuss)\b/],
