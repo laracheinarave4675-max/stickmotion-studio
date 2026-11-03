@@ -73,3 +73,13 @@ Never confuse a successful static-site deployment with a finished video generato
 - Latest validated commit before this log: c587fc33.
 - GitHub Actions run 41724933422 completed successfully: JavaScript syntax check passed, all scene planner tests passed, Pages configuration passed, artifact upload passed, and deployment passed.
 - Remaining: validate the deployed page and WebM export on Android; then build the 60-second voice/subtitle/MP4 pipeline before scaling.
+
+## 2026-11-03 milestone — subtitle output
+- Added optional narration captions drawn directly onto the canvas; because the WebM recorder captures the canvas, captions are burned into exported video when the checkbox is enabled.
+- Added SRT subtitle export with scene-based start/end times derived from the storyboard's estimated durations.
+- Added an independent Export SRT control and a toggle for burned-in captions.
+- SRT generation is scene-timed, not word-aligned; current scene durations remain estimates, so subtitle timing must be reviewed before final publication.
+- Browser video output is still silent WebM; MP4 and voice generation are not yet implemented.
+- Commits: caption/SRT logic 00c040fb, UI e2e24670, styling 54f265e9, escape correction c3623dc3.
+- Latest CI for this milestone is running; confirm syntax, tests and deployment before treating it as validated.
+- Next: validate UI/export on mobile browser; implement a 60-second voice + captions + mux/render pipeline with freely available components, then measure runtime/quality.
