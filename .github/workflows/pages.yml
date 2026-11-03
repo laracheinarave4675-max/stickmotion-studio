@@ -25,7 +25,9 @@ jobs:
         with:
           node-version: 20
       - name: Check JavaScript syntax
-        run: node --check src/main.js
+        run: npm run check
+      - name: Run scene planner tests
+        run: npm test
       - name: Configure Pages
         uses: actions/configure-pages@v5
         with:
