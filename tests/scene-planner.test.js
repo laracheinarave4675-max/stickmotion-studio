@@ -63,3 +63,13 @@ test("wraps captions and limits them to two readable lines", () => {
   assert.equal(lines.length, 2);
   assert.ok(lines[1].endsWith("…"));
 });
+
+test("wraps unusually long unbroken words without overflowing caption width", () => {
+  const lines = wrapCaption("A".repeat(40), 12, 2);
+  assert.equal(lines.length, 2);
+  assert.ok(lines.every((line) => line.length <= 12));
+  assert.ok(lines[0].endsWith("-"));
+});
+test("returns an empty SRT document for an empty storyboard", () => {
+  assert.equal(buildSrt([]), "");
+});
