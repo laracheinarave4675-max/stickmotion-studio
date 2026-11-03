@@ -5,7 +5,7 @@
   "type": "module",
   "description": "A mobile-first stick-figure storyboard and animation prototype.",
   "scripts": {
-    "check": "node --check src/main.js && node --check src/scene-planner.js",
+    "check": "node --check src/main.js && node --check src/scene-planner.js && node --check src/subtitles.js",
     "test": "node --test"
   },
   "engines": {
