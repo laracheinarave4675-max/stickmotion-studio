@@ -66,5 +66,6 @@ jobs:
             output/stickmotion-pilot.srt
             output/stickmotion-pilot.json
             output/narration.wav
+            output/music.wav
             output/narration.txt
           retention-days: 3
