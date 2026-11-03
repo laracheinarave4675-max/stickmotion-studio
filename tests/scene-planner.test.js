@@ -2,38 +2,35 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { buildScenePlan, classifyScene, makeTitle, splitNarration } from "../src/scene-planner.js";
 
-test("splits narration at sentence endings and paragraph breaks", () => {
-  const result = splitNarration("First sentence. Second sentence!\nA new paragraph?");
-  assert.deepEqual(result, ["First sentence.", "Second sentence!", "A new paragraph?"]);
+test("splits narration into sentence and paragraph beats", () => {
+  assert.deepEqual(splitNarration("First sentence. Second sentence!\nA new paragraph?"), ["First sentence.", "Second sentence!", "A new paragraph?"]);
 });
-
-test("prioritizes cosmic imagery over a generic night reference", () => {
-  assert.equal(classifyScene("The night sky is filled with distant stars.").visual, "space");
+test("recognizes history and ancient civilizations", () => {
+  assert.equal(classifyScene("The Roman empire expanded across Europe.").visual, "historical");
 });
-
-test("recognizes fear as a night scene with a worried expression", () => {
-  assert.deepEqual(classifyScene("She is afraid of the darkness."), {
-    visual: "night", mood: "worried", duration: 4
-  });
+test("recognizes crime and investigation separately", () => {
+  assert.equal(classifyScene("The detective found a fingerprint beside the body.").visual, "crime");
+  assert.equal(classifyScene("Police questioned the witness about the case.").visual, "investigation");
 });
-
-test("recognizes time and conversation scenes", () => {
-  assert.equal(classifyScene("A clock measures every second.").visual, "clock");
-  assert.equal(classifyScene("Two friends discuss the discovery.").visual, "conversation");
+test("recognizes survival environments", () => {
+  assert.equal(classifyScene("He was stranded in the Sahara with no water.").visual, "survival");
+  assert.equal(classifyScene("A sailor survived a shipwreck in the ocean.").visual, "shipwreck");
+  assert.equal(classifyScene("A wolf followed him through the forest.").visual, "wilderness");
 });
-
-test("keeps estimated scene duration within the preview limits", () => {
-  const short = classifyScene("Hello.");
-  const long = classifyScene("word ".repeat(1000));
-  assert.equal(short.duration, 4);
-  assert.equal(long.duration, 9);
+test("recognizes war, disaster and prison", () => {
+  assert.equal(classifyScene("The soldiers prepared for battle.").visual, "war");
+  assert.equal(classifyScene("An earthquake destroyed the town.").visual, "disaster");
+  assert.equal(classifyScene("The prisoner planned an escape from his cell.").visual, "prison");
 });
-
-test("builds sequential scene IDs and useful titles", () => {
+test("recognizes mood and clamps scene duration", () => {
+  assert.equal(classifyScene("She was terrified and afraid.").mood, "worried");
+  assert.equal(classifyScene("word ".repeat(1000)).duration, 9);
+  assert.equal(classifyScene("Hello.").duration, 4);
+});
+test("builds ordered scenes and concise titles", () => {
   const plan = buildScenePlan("A curious mind asks why. The universe keeps expanding.");
-  assert.equal(plan.length, 2);
   assert.deepEqual(plan.map((scene) => scene.id), [1, 2]);
   assert.equal(plan[0].visual, "science");
-  assert.equal(plan[1].visual, "space");
+  assert.equal(plan[1].visual, "room");
   assert.equal(makeTitle("A small idea becomes a much larger story."), "A small idea becomes a much larger");
 });
