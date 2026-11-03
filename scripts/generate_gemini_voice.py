@@ -34,7 +34,7 @@ def split_text(text: str, max_chars: int = CHUNK_CHARACTERS) -> list[str]:
     remaining = text
     while len(remaining) > max_chars:
         window = remaining[:max_chars + 1]
-        candidates = [m.end() for m in re.finditer(r"(?:[.!?][\"')\]]*\\s+|\\n\\s*\\n)", window)]
+        candidates = [m.end() for m in re.finditer(r"(?:[.!?][\"')\]]*\s+|\n\s*\n)", window)]
         cut = candidates[-1] if candidates else window.rfind(" ")
         if cut < max_chars // 2:
             cut = max_chars
@@ -85,7 +85,7 @@ def main() -> int:
         client = genai.Client(api_key=os.environ["GEMINI_API_KEY"])
         pcm_chunks: list[bytes] = []
         for index, chunk in enumerate(chunks, start=1):
-            prompt = f"{args.style} Read the following narration verbatim. Do not add, omit, or paraphrase any words.\\n\\n{chunk}"
+            prompt = f"{args.style} Read the following narration verbatim. Do not add, omit, or paraphrase any words.\n\n{chunk}"
             response = client.models.generate_content(
                 model=args.model,
                 contents=prompt,
