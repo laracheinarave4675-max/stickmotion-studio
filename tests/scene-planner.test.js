@@ -43,3 +43,4 @@ test("builds ordered scenes and concise titles", () => {
   assert.equal(makeTitle("A small idea becomes a much larger story."), "A small idea becomes a much larger");
   assert.equal(plan[0].action, "observing or explaining");
 });
+\ntest("recognizes direct object interaction actions", () => {\n  assert.equal(classifyScene("He opened the heavy cell door with a key.").action, "opening or unlocking");\n  assert.equal(classifyScene("She picked up the evidence folder.").action, "picking up or collecting");\n  assert.equal(classifyScene("The sailor rescued his friend from the water.").action, "helping or rescuing");\n});\n
