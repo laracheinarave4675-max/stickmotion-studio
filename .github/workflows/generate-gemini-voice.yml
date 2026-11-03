@@ -9,18 +9,23 @@ on:
       voice:
         description: Gemini voice
         required: true
-        default: Kore
+        default: Charon
         type: choice
         options:
-          - Kore
-          - Aoede
           - Charon
+          - Iapetus
+          - Rasalgethi
+          - Algieba
+          - Orus
+          - Alnilam
+          - Schedar
+          - Sadaltager
           - Fenrir
           - Puck
       style:
         description: Delivery direction
         required: true
-        default: Calm, authoritative, cinematic documentary narration. Natural pacing, clear articulation, restrained emotion.
+        default: Measured, warm, authoritative documentary narration. Natural pacing, clear articulation, restrained emotion. Avoid an exaggerated announcer style.
         type: string
       model:
         description: Gemini TTS model
