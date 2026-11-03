@@ -1,6 +1,6 @@
 # StickMotion Studio — Project State
 
-Last updated: 2026-11-03
+Last updated: 2026-11-03 (milestone: genre pivot)
 
 ## Product direction (confirmed)
 This is a story-animation studio, not a space/science video maker. The intended channel subjects include history, survival stories, true crime, investigations, disasters, wars, mysteries, and related narrative documentaries.
@@ -19,7 +19,10 @@ Keep the reference look: expressive hand-drawn stick figures, bold black outline
 ## Current implementation (2026-11-03)
 - Mobile-first static web UI.
 - Sentence-based scene planner in src/scene-planner.js.
-- Rule-based scene categories being expanded for historical, crime, investigation, survival, desert, shipwreck, wilderness, war, disaster, prison, night, conversation, journey and generic explanatory scenes.
+- Rule-based scene categories: historical, crime, investigation, prison, survival, desert, shipwreck, wilderness, war, disaster, night, conversation, journey and generic explanatory scenes.
+- Canvas preview now includes hand-drawn procedural backdrops for historical settings, crime scenes, evidence boards, survival landscapes, deserts, shipwrecks, wilderness, battlefields, disaster aftermath and prison cells.
+- Example script now demonstrates a Titanic-style shipwreck survival story.
+- CI JavaScript syntax check passed. First genre test run exposed a category-priority collision (prison escape classified as generic survival); prison priority was corrected and a fresh CI run is pending.
 - Canvas stick-figure preview with play/pause and scene navigation.
 - JSON scene-plan export.
 - Node built-in unit tests in tests/scene-planner.test.js.
@@ -27,7 +30,7 @@ Keep the reference look: expressive hand-drawn stick figures, bold black outline
 - No TTS, word-level subtitle alignment, AI semantic planner, sound design, or MP4 renderer is integrated yet.
 
 ## Current milestone
-Replace the earlier space-centric sample scenes with narrative environments for history, survival and crime. Expand the scene planner and canvas scene library, then run all tests and verify GitHub Actions. Keep the project-state file updated after meaningful changes.
+Continue refining narrative scene classification and character actions; verify the latest CI run. The earlier space-oriented visuals are no longer the product direction. Keep the project-state file updated after meaningful changes.
 
 ## Next milestones
 1. Scene-specific sets, props, camera framing and character actions for the target genres.
