@@ -50,20 +50,20 @@ def draw_person(draw, x, floor, t, action, mood, color):
     if action in ("fighting","running"):
         line(draw,[shoulder,(x-115,floor-190+bob),(x-165,floor-245+bob)],color,17)
         line(draw,[shoulder,(x+115,floor-190+bob),(x+165,floor-245+bob)],color,17)
-    elif action in ("opening or unlocking","picking up or collecting","searching for clues"):
+    elif action in ("opening or unlocking","picking up or collecting","searching for clues","reaching or handing over","helping or rescuing","discovering or revealing"):
         line(draw,[shoulder,(x-105,floor-165+bob),(x-165,floor-205+bob)],color,17)
         line(draw,[shoulder,(x+105,floor-165+bob),(x+155,floor-95+bob)],color,17)
     else:
         line(draw,[shoulder,(x-105,floor-170+bob),(x-145,floor-115+bob)],color,17)
         line(draw,[shoulder,(x+105,floor-170+bob),(x+145,floor-115+bob)],color,17)
 def draw_prop(draw, name, x, y, ink):
-    if "map" in name or "document" in name or "letter" in name or "evidence" in name:
+    if any(key in name for key in ("map","document","letter","evidence","photograph","note")):
         draw.rectangle((x-65,y-45,x+65,y+45),fill=(239,224,180),outline=ink,width=8)
         draw.line((x-42,y-15,x+40,y-15),fill=ink,width=5); draw.line((x-42,y+5,x+25,y+5),fill=ink,width=5)
     elif "clock" in name:
         draw.ellipse((x-48,y-48,x+48,y+48),fill=(245,245,235),outline=ink,width=8)
         draw.line((x,y,x,y-28),fill=ink,width=7); draw.line((x,y,x+25,y+12),fill=ink,width=7)
-    elif "boat" in name:
+    elif "boat" in name or "raft" in name or "vessel" in name:
         draw.polygon([(x-90,y),(x+90,y),(x+55,y+35),(x-55,y+35)],fill=(129,87,54),outline=ink)
         draw.line((x,y-90,x,y),fill=ink,width=8); draw.polygon([(x+5,y-85),(x+65,y-20),(x+5,y-20)],fill=(235,230,210))
     else:
@@ -103,7 +103,8 @@ def draw_scene(scene, index, t, duration, caption):
     if scene.get("visual") in ("conversation","investigation") or "talk" in scene.get("narration","").lower():
         draw_person(d,1320,floor,t+1.2,"observing or explaining","thinking",ink)
     # animated motion accents
-    if action in ("running","fighting","falling or collapsing"):
+    if action in ("running","fighting","falling or collapsing","swimming or struggling in water","climbing"):
+
         for k in range(3):
             sx=x-230-k*38
             d.line((sx,520+k*35,sx-45,520+k*35),fill=ink,width=7)
