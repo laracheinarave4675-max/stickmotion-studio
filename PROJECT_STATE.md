@@ -1,6 +1,6 @@
 # StickMotion Studio — Project State
 
-Last updated: 2026-11-03 (milestone: first real browser video export path)
+Last updated: 2026-11-03 (milestone: Gemini TTS comparison path added)
 
 ## Product direction (confirmed)
 This is a story-animation studio, not a space/science video maker. The intended channel subjects include history, survival stories, true crime, investigations, disasters, wars, mysteries, and related narrative documentaries.
@@ -103,3 +103,14 @@ Never confuse a successful static-site deployment with a finished video generato
 - Next major engineering step: build a bounded 60-second cloud render proof-of-concept using free/open-source TTS and FFmpeg, with strict artifact/runtime limits before considering longer videos.
 
 - Follow-up inspection caught an over-escaped word-boundary regex in the character interaction matcher; corrected it in commit 769f29ef so phrases such as "holding the map" and "using the flashlight" match actual word boundaries.
+
+
+## 2026-11-03 milestone — Gemini TTS alternative added
+- Reassessed Piper: it remains a lightweight fallback, not the assumed quality winner.
+- Added `scripts/generate_gemini_voice.py` using the official Google GenAI Python SDK and Gemini audio-generation API. It validates up to 18,000 characters, splits narration at sentence/paragraph boundaries into chunks of up to 2,800 characters, requests a consistent selected voice/style per chunk, joins returned 24 kHz mono 16-bit PCM, and writes one WAV plus metadata.
+- Added manual GitHub Actions workflow `.github/workflows/generate-gemini-voice.yml`. It offers Gemini 2.5 Flash TTS and 3.1 Flash TTS preview models, voice and delivery-style inputs, and uploads a 3-day artifact. Requires the user to add a repository Actions secret named `GEMINI_API_KEY`; no API key is stored in the repository.
+- Added tests for input limits, chunk splitting/text preservation and WAV header/frame output. Added these tests to the Pages CI syntax/test job.
+- Official pricing distinction: Gemini Developer API pricing currently lists free-tier use for certain TTS models; Google Cloud Text-to-Speech pricing is separate and lists no free usage limit for Gemini-TTS there. Free-tier quota/model availability can change, and Gemini API free-tier content may be used to improve Google products. Do not describe Google TTS generically as unlimited/free.
+- Piper workflow retained as a no-key fallback. README now documents Gemini workflow and key setup.
+- Important validation boundary: code and unit tests are wired into CI, but the Gemini workflow has not yet been run with a real API key. No Gemini WAV exists yet; no real voice quality, quota, chunk-join continuity, or 15-minute duration is verified. Audio is still not merged into MP4.
+- Next: inspect CI result; then user adds a free Gemini API key in GitHub Actions secrets and runs a 1–2 minute sample first. Listen to the WAV and compare it with Piper before selecting a default. After voice acceptance, integrate narration WAV + SRT with a bounded 60-second FFmpeg MP4 renderer.
