@@ -11,7 +11,10 @@ MODULE = importlib.util.module_from_spec(SPEC)
 SPEC.loader.exec_module(MODULE)
 MUSIC_SPEC = importlib.util.spec_from_file_location("generate_music", ROOT / "scripts" / "generate_music.py")
 MUSIC = importlib.util.module_from_spec(MUSIC_SPEC)
-MUSIC_SPEC.loader.exec_module(MUSIC)\nSFX_SPEC = importlib.util.spec_from_file_location("generate_sfx", ROOT / "scripts" / "generate_sfx.py")\nSFX = importlib.util.module_from_spec(SFX_SPEC)\nSFX_SPEC.loader.exec_module(SFX)
+MUSIC_SPEC.loader.exec_module(MUSIC)
+SFX_SPEC = importlib.util.spec_from_file_location("generate_sfx", ROOT / "scripts" / "generate_sfx.py")
+SFX = importlib.util.module_from_spec(SFX_SPEC)
+SFX_SPEC.loader.exec_module(SFX)
 
 class RendererTests(unittest.TestCase):
     def test_scene_planner_contract_and_frame_dimensions(self):
