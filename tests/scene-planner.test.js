@@ -3,7 +3,8 @@ import assert from "node:assert/strict";
 import { buildScenePlan, classifyScene, makeTitle, splitNarration } from "../src/scene-planner.js";
 
 test("splits narration into sentence and paragraph beats", () => {
-  assert.deepEqual(splitNarration("First sentence. Second sentence!\nA new paragraph?"), ["First sentence.", "Second sentence!", "A new paragraph?"]);
+  assert.deepEqual(splitNarration("First sentence. Second sentence!
+A new paragraph?"), ["First sentence.", "Second sentence!", "A new paragraph?"]);
 });
 test("recognizes history and ancient civilizations", () => {
   assert.equal(classifyScene("The Roman empire expanded across Europe.").visual, "historical");
@@ -43,4 +44,9 @@ test("builds ordered scenes and concise titles", () => {
   assert.equal(makeTitle("A small idea becomes a much larger story."), "A small idea becomes a much larger");
   assert.equal(plan[0].action, "observing or explaining");
 });
-\ntest("recognizes direct object interaction actions", () => {\n  assert.equal(classifyScene("He opened the heavy cell door with a key.").action, "opening or unlocking");\n  assert.equal(classifyScene("She picked up the evidence folder.").action, "picking up or collecting");\n  assert.equal(classifyScene("The sailor rescued his friend from the water.").action, "helping or rescuing");\n});\n
+
+test("recognizes direct object interaction actions", () => {
+  assert.equal(classifyScene("He opened the heavy cell door with a key.").action, "opening or unlocking");
+  assert.equal(classifyScene("She picked up the evidence folder.").action, "picking up or collecting");
+  assert.equal(classifyScene("The sailor rescued his friend from the water.").action, "helping or rescuing");
+});
