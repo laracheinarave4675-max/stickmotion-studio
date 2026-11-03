@@ -57,7 +57,7 @@ def main() -> int:
             "limit_characters": MAX_CHARACTERS,
         }
         args.output.with_suffix(".json").write_text(
-            json.dumps(metadata, indent=2) + "\\n", encoding="utf-8"
+            json.dumps(metadata, indent=2), encoding="utf-8"
         )
         print(json.dumps(metadata))
     except Exception as exc:
