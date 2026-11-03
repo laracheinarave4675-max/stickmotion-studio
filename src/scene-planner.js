@@ -33,7 +33,7 @@ const PROP_RULES = [
 ];
 
 const ACTION_RULES = [
-  ["running", /\b(run|running|flee|fleeing|chase|chasing|escape|escaping)\b/],
+  ["running", /\b(run|ran|running|flee|fled|fleeing|chase|chased|chasing|escape|escaping)\b/],
   ["walking or travelling", /\b(walk|walking|travel|journey|march|cross|approach)\b/],
   ["searching for clues", /\b(search|searching|investigat|examine|inspect|look for|track|tracking)\b/],
   ["fighting", /\b(fight|fighting|attack|attacking|battle|combat|defend)\b/],
