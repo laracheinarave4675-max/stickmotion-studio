@@ -83,3 +83,11 @@ Never confuse a successful static-site deployment with a finished video generato
 - Commits: caption/SRT logic 00c040fb, UI e2e24670, styling 54f265e9, escape correction c3623dc3.
 - Latest CI for this milestone is running; confirm syntax, tests and deployment before treating it as validated.
 - Next: validate UI/export on mobile browser; implement a 60-second voice + captions + mux/render pipeline with freely available components, then measure runtime/quality.
+
+## 2026-11-03 milestone — isolated and tested subtitle utilities
+- Extracted SRT timestamp generation, sequential cue generation, and caption line wrapping into src/subtitles.js.
+- Main canvas and SRT download now use the shared utility module rather than inline duplicate logic.
+- Added unit tests for timestamp formatting, sequential SRT cue timing, and two-line caption truncation.
+- Commits: subtitles module dd3dedf6; main integration d8803741; tests 13ef79da.
+- CI for this refactor is pending; do not treat it as validated until the latest Actions run completes.
+- Known limitation: cue timing follows estimated scene durations and each narration sentence remains a single cue; no word-level forced alignment.
