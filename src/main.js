@@ -3,8 +3,7 @@ const $ = (selector) => document.querySelector(selector);
 const canvas = $("#stage");
 const ctx = canvas.getContext("2d");
 const input = $("#script-input");
-const exampleScript = ["In 1912, a passenger ship struck an iceberg in the freezing Atlantic.","As the ship began to sink, hundreds of people struggled to find a place on a lifeboat.","Some survivors drifted for hours in the darkness, surrounded by freezing water.","Investigators later examined the wreckage and witness accounts to understand what went wrong.","Their stories reveal how preparation, chance, and human decisions can determine who survives."].join("
-");
+const exampleScript = ["In 1912, a passenger ship struck an iceberg in the freezing Atlantic.","As the ship began to sink, hundreds of people struggled to find a place on a lifeboat.","Some survivors drifted for hours in the darkness, surrounded by freezing water.","Investigators later examined the wreckage and witness accounts to understand what went wrong.","Their stories reveal how preparation, chance, and human decisions can determine who survives."].join("\n");
 let scenes=[],activeScene=0,playing=true,sceneStartedAt=performance.now(),pausedElapsed=0;
 const visualLabels={historical:"Historical era",crime:"Crime scene",investigation:"Investigation",survival:"Survival",desert:"Desert survival",shipwreck:"Shipwreck",wilderness:"Wilderness",war:"War / battle",disaster:"Disaster",prison:"Prison / escape",night:"Night scene",clock:"Timeline",conversation:"Conversation",journey:"Journey",science:"Explainer",room:"Interior scene"};
 input.addEventListener("input",updateWordCount);
@@ -15,13 +14,67 @@ $("#previous-scene").addEventListener("click",()=>changeScene(-1));
 $("#next-scene").addEventListener("click",()=>changeScene(1));
 $("#export-plan").addEventListener("click",exportScenePlan);
 $("#export-video").addEventListener("click",exportAnimatedPreview);
+$("#cancel-export").addEventListener("click",()=>{exportCancelled=true;$("#cancel-export").disabled=true;$("#export-status").textContent="Cancelling export…"});
 function updateWordCount(){const count=input.value.trim().match(/\S+/g)?.length??0;$("#word-count").textContent=count+(count===1?" word":" words")}
 function buildStoryboard(){scenes=buildScenePlan(input.value);if(!scenes.length){input.focus();$("#scene-caption").textContent="Add your narration first, then build the storyboard.";return}activeScene=0;playing=true;pausedElapsed=0;sceneStartedAt=performance.now();$("#play-toggle").textContent="Ⅱ";$("#play-toggle").setAttribute("aria-label","Pause preview");$("#export-plan").disabled=false;$("#export-video").disabled=false;renderSceneCards();selectScene(0)}
-function renderSceneCards(){const grid=$("#scene-grid");grid.className="scene-grid";grid.replaceChildren();$("#scene-count").textContent=scenes.length+(scenes.length===1?" scene":" scenes");scenes.forEach((scene,index)=>{const card=document.createElement("button");card.type="button";card.className="scene-card"+(index===activeScene?" active":"");card.innerHTML='<div class="scene-card-top"><span class="scene-number"></span><span class="scene-kind"></span></div><h3></h3><p></p><div class="scene-direction"><span class="scene-action"></span><span class="scene-setting"></span><span class="scene-props"></span></div><span class="scene-duration"></span>';card.querySelector(".scene-number").textContent="SCENE "+String(index+1).padStart(2,"0");card.querySelector(".scene-kind").textContent=visualLabels[scene.visual];card.querySelector("h3").textContent=scene.title;card.querySelector("p").textContent=scene.narration;card.querySelector(".scene-action").textContent="ACTION · "+scene.action;card.querySelector(".scene-setting").textContent="SETTING · "+scene.setting;card.querySelector(".scene-props").textContent="PROPS · "+(scene.props.length?scene.props.join(", "):"none identified");card.querySelector(".scene-duration").textContent="Estimated duration · "+scene.duration+" sec";card.addEventListener("click",()=>selectScene(index));grid.append(card)})}
+function renderSceneCards(){const grid=$("#scene-grid");grid.className="scene-grid";grid.replaceChildren();$("#scene-count").textContent=scenes.length+(scenes.length===1?" scene":" scenes")+" · "+formatTime(scenes.reduce((sum,scene)=>sum+(Number(scene.duration)||0),0));scenes.forEach((scene,index)=>{const card=document.createElement("button");card.type="button";card.className="scene-card"+(index===activeScene?" active":"");card.innerHTML='<div class="scene-card-top"><span class="scene-number"></span><span class="scene-kind"></span></div><h3></h3><p></p><div class="scene-direction"><span class="scene-action"></span><span class="scene-setting"></span><span class="scene-props"></span></div><span class="scene-duration"></span>';card.querySelector(".scene-number").textContent="SCENE "+String(index+1).padStart(2,"0");card.querySelector(".scene-kind").textContent=visualLabels[scene.visual];card.querySelector("h3").textContent=scene.title;card.querySelector("p").textContent=scene.narration;card.querySelector(".scene-action").textContent="ACTION · "+scene.action;card.querySelector(".scene-setting").textContent="SETTING · "+scene.setting;card.querySelector(".scene-props").textContent="PROPS · "+(scene.props.length?scene.props.join(", "):"none identified");card.querySelector(".scene-duration").textContent="Estimated duration · "+scene.duration+" sec";card.addEventListener("click",()=>selectScene(index));grid.append(card)})}
 function selectScene(index){if(!scenes.length)return;activeScene=(index+scenes.length)%scenes.length;sceneStartedAt=performance.now();pausedElapsed=0;const scene=scenes[activeScene];$("#preview-title").textContent="Scene "+String(activeScene+1).padStart(2,"0");$("#scene-caption").textContent=scene.narration;$("#scene-position").textContent="Scene "+(activeScene+1)+" of "+scenes.length;$("#scene-clock").textContent="00:00 / 00:"+String(scene.duration).padStart(2,"0");[...$("#scene-grid").children].forEach((card,i)=>card.classList.toggle("active",i===activeScene));$("#progress-fill").style.width="0%"}
 function changeScene(direction){if(scenes.length)selectScene(activeScene+direction)}
 function togglePlayback(){if(!scenes.length)return;if(playing){pausedElapsed=performance.now()-sceneStartedAt;playing=false;$("#play-toggle").textContent="▶";$("#play-toggle").setAttribute("aria-label","Play preview")}else{sceneStartedAt=performance.now()-pausedElapsed;playing=true;$("#play-toggle").textContent="Ⅱ";$("#play-toggle").setAttribute("aria-label","Pause preview")}}
-async function exportAnimatedPreview(){if(!scenes.length)return;if(!canvas.captureStream||!window.MediaRecorder){$("#export-status").textContent="Video recording is not supported in this browser.";return}const button=$("#export-video");button.disabled=true;button.textContent="Rendering…";$("#export-status").textContent="Recording storyboard scenes in real time. Keep this tab open.";const stream=canvas.captureStream(30);const mimeType=["video/webm;codecs=vp9","video/webm;codecs=vp8","video/webm"].find(type=>MediaRecorder.isTypeSupported(type));if(!mimeType){button.disabled=false;button.textContent="Export animated preview";$("#export-status").textContent="This browser does not offer a supported WebM encoder.";stream.getTracks().forEach(track=>track.stop());return}const recorder=new MediaRecorder(stream,{mimeType,videoBitsPerSecond:5000000});const chunks=[];recorder.ondataavailable=event=>{if(event.data.size)chunks.push(event.data)};recorder.onerror=()=>{$("#export-status").textContent="Recording failed. Try a shorter storyboard.";button.disabled=false;button.textContent="Export animated preview";stream.getTracks().forEach(track=>track.stop())};recorder.onstop=()=>{const blob=new Blob(chunks,{type:mimeType});const url=URL.createObjectURL(blob);const link=document.createElement("a");link.href=url;link.download="stickmotion-preview.webm";link.click();setTimeout(()=>URL.revokeObjectURL(url),30000);stream.getTracks().forEach(track=>track.stop());button.disabled=false;button.textContent="Export animated preview";$("#export-status").textContent="Video exported as WebM. This preview has no voice or music yet."};const originalScene=activeScene,wasPlaying=playing;playing=false;recorder.start(1000);let total=0;for(let index=0;index<scenes.length;index++){activeScene=index;sceneStartedAt=performance.now();pausedElapsed=0;selectScene(index);playing=false;const duration=scenes[index].duration*1000;const start=performance.now();while(performance.now()-start<duration){await new Promise(resolve=>requestAnimationFrame(resolve));drawScene(performance.now())}total+=duration}recorder.stop();activeScene=originalScene;playing=wasPlaying;sceneStartedAt=performance.now();pausedElapsed=0;$("#export-status").textContent="Finishing video file…"}
+let exportCancelled=false;
+async function exportAnimatedPreview(){
+ if(!scenes.length||exportCancelled)return;
+ if(!canvas.captureStream||!window.MediaRecorder){$("#export-status").textContent="Video recording is not supported in this browser.";return}
+ const button=$("#export-video"),cancel=$("#cancel-export"),status=$("#export-status");
+ button.disabled=true;button.textContent="Rendering…";cancel.hidden=false;cancel.disabled=false;exportCancelled=false;
+ status.textContent="Preparing animated WebM export… Keep this tab open.";
+ const originalScene=activeScene,wasPlaying=playing,stream=canvas.captureStream(30);
+ let recorder=null,finished=false,failed=false;
+ const restore=()=>{activeScene=originalScene;playing=wasPlaying;sceneStartedAt=performance.now();pausedElapsed=0;selectScene(originalScene);playing=wasPlaying;button.disabled=false;button.textContent="Export animated preview";cancel.hidden=true;cancel.disabled=false;stream.getTracks().forEach(track=>track.stop())};
+ try{
+  const mimeType=["video/webm;codecs=vp9","video/webm;codecs=vp8","video/webm"].find(type=>MediaRecorder.isTypeSupported(type));
+  if(!mimeType)throw new Error("This browser does not offer a supported WebM encoder.");
+  recorder=new MediaRecorder(stream,{mimeType,videoBitsPerSecond:5000000});
+  const chunks=[];
+  const stopped=new Promise((resolve,reject)=>{
+   recorder.ondataavailable=event=>{if(event.data.size)chunks.push(event.data)};
+   recorder.onerror=()=>{failed=true;reject(new Error("Recording failed. Try a shorter storyboard."))};
+   recorder.onstop=()=>resolve();
+  });
+  playing=false;recorder.start(1000);
+  const totalMs=scenes.reduce((sum,scene)=>sum+Math.max(1,Number(scene.duration)||1)*1000,0);
+  let completedMs=0;
+  for(let index=0;index<scenes.length&&!exportCancelled;index++){
+   activeScene=index;selectScene(index);playing=false;
+   const duration=Math.max(1,Number(scenes[index].duration)||1)*1000,start=performance.now();
+   while(performance.now()-start<duration&&!exportCancelled){
+    await new Promise(resolve=>requestAnimationFrame(resolve));
+    drawScene(performance.now());
+    const elapsed=Math.min(duration,performance.now()-start);
+    const pct=Math.min(99,Math.round((completedMs+elapsed)/totalMs*100));
+    status.textContent=(exportCancelled?"Cancelling…":"Rendering scene "+(index+1)+" of "+scenes.length+" · "+pct+"%");
+   }
+   completedMs+=duration;
+  }
+  if(recorder.state!=="inactive")recorder.stop();
+  await stopped;
+  if(failed)throw new Error("Recording failed. Try a shorter storyboard.");
+  if(exportCancelled){status.textContent="Export cancelled. Your storyboard is unchanged.";return}
+  const blob=new Blob(chunks,{type:mimeType});
+  if(!blob.size)throw new Error("The browser produced an empty video file.");
+  const url=URL.createObjectURL(blob),link=document.createElement("a");
+  link.href=url;link.download="stickmotion-preview.webm";link.click();
+  setTimeout(()=>URL.revokeObjectURL(url),30000);
+  status.textContent="Export complete · WebM · "+formatTime(totalMs/1000)+". Silent preview only; audio and subtitles are not included.";
+ }catch(error){
+  if(recorder&&recorder.state!=="inactive"){try{recorder.stop()}catch{}}
+  status.textContent=error.message||"Export failed. Try a shorter storyboard.";
+ }finally{restore()}
+}
+function formatTime(seconds){
+ const whole=Math.max(0,Math.round(seconds)),hours=Math.floor(whole/3600),minutes=Math.floor((whole%3600)/60),secs=whole%60;
+ return hours?hours+":"+String(minutes).padStart(2,"0")+":"+String(secs).padStart(2,"0"):minutes+":"+String(secs).padStart(2,"0");
+}
 function exportScenePlan(){if(!scenes.length)return;const plan={project:"StickMotion Studio",version:1,format:{width:1920,height:1080,fps:30,aspectRatio:"16:9"},scenes:scenes.map(({id,narration,title,visual,mood,duration,setting,action,props,camera,transition})=>({id,title,narration,visual,mood,setting,action,props,camera,transition,durationSeconds:duration}))};const blob=new Blob([JSON.stringify(plan,null,2)],{type:"application/json"});const url=URL.createObjectURL(blob);const link=document.createElement("a");link.href=url;link.download="stickmotion-scene-plan.json";link.click();URL.revokeObjectURL(url)}
 function stroke(x1,y1,x2,y2,width=8){ctx.lineWidth=width;ctx.lineCap="round";ctx.lineJoin="round";ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke()}
 function drawHead(x,y,mood,scale=1){const radius=49*scale;ctx.fillStyle="#fff";ctx.strokeStyle="#171916";ctx.lineWidth=8*scale;ctx.beginPath();ctx.arc(x,y,radius,0,Math.PI*2);ctx.fill();ctx.stroke();ctx.fillStyle="#171916";ctx.beginPath();ctx.arc(x-16*scale,y-5*scale,4.5*scale,0,Math.PI*2);ctx.arc(x+16*scale,y-5*scale,4.5*scale,0,Math.PI*2);ctx.fill();ctx.strokeStyle="#171916";ctx.lineWidth=4*scale;if(mood==="worried"){stroke(x-27*scale,y-23*scale,x-8*scale,y-29*scale,3.5*scale);stroke(x+8*scale,y-29*scale,x+27*scale,y-23*scale,3.5*scale);ctx.beginPath();ctx.arc(x,y+24*scale,11*scale,Math.PI,Math.PI*2);ctx.stroke()}else if(mood==="happy"){ctx.beginPath();ctx.arc(x,y+5*scale,17*scale,.15,Math.PI-.15);ctx.stroke()}else if(mood==="thinking"){ctx.beginPath();ctx.arc(x+4*scale,y+21*scale,8*scale,Math.PI*1.1,Math.PI*1.9);ctx.stroke()}else stroke(x-10*scale,y+25*scale,x+10*scale,y+25*scale,3.5*scale)}
