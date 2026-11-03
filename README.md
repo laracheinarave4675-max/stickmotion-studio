@@ -60,3 +60,11 @@ A second voice path is available for quality comparison. It uses the Gemini Deve
 The workflow defaults to `gemini-2.5-flash-preview-tts`; `gemini-3.1-flash-tts-preview` is also selectable. It joins 2,800-character narration chunks into one 24 kHz mono WAV. This is a long-form experiment, not yet a proven 15-minute production pipeline: actual account quota, model access, audio continuity and pronunciation must be tested. Gemini API free-tier availability and limits can change; Google Cloud Text-to-Speech has separate billing rules. The free Gemini API tier may use submitted data to improve Google products, so do not submit private or sensitive narration.
 
 The Piper workflow remains as a no-key fallback. Neither voice path is yet muxed automatically into the MP4 renderer.
+
+
+## Cloud MP4 pilot (bounded test)
+The manual **Render StickMotion 60-second MP4 pilot** workflow creates a short narrated video without requiring a local computer. It uses the repository's Gemini API secret (`GEMINI_API_KEY`), the selected Gemini male voice (default: Charon), the existing story-aware scene planner, a procedural Pillow stick-figure renderer, and FFmpeg. The output artifact contains an H.264/AAC MP4, an SRT file, narration WAV, and render metadata.
+
+This is a deliberately bounded proof of concept: narration is limited to 1,800 characters and rendered audio to 90 seconds. The first renderer uses scene-aware procedural sets, poses, props, simple motion, and burned-in captions; it is not yet a full generative animation system. Music/SFX and precise word-level subtitle alignment are not included. GitHub Actions usage is subject to the account's available minutes and quotas; do not assume unlimited free rendering.
+
+To run it: open **Actions → Render StickMotion 60-second MP4 pilot → Run workflow**, paste a short English narration, keep Charon selected, and download the `stickmotion-mp4-pilot` artifact when the run succeeds. Inspect the actual MP4 before using longer scripts.
