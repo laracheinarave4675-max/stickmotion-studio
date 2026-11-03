@@ -1,0 +1,76 @@
+name: Generate narration with Gemini TTS
+on:
+  workflow_dispatch:
+    inputs:
+      narration:
+        description: English narration (up to 18,000 characters; long-form test)
+        required: true
+        type: string
+      voice:
+        description: Gemini voice
+        required: true
+        default: Kore
+        type: choice
+        options:
+          - Kore
+          - Aoede
+          - Charon
+          - Fenrir
+          - Puck
+      style:
+        description: Delivery direction
+        required: true
+        default: Calm, authoritative, cinematic documentary narration. Natural pacing, clear articulation, restrained emotion.
+        type: string
+      model:
+        description: Gemini TTS model
+        required: true
+        default: gemini-2.5-flash-preview-tts
+        type: choice
+        options:
+          - gemini-2.5-flash-preview-tts
+          - gemini-3.1-flash-tts-preview
+permissions:
+  contents: read
+  actions: read
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install Gemini SDK
+        run: python -m pip install --disable-pip-version-check google-genai
+      - name: Save narration input
+        env:
+          NARRATION: ${{ inputs.narration }}
+        run: |
+          python - <<'PY'
+          import os
+          from pathlib import Path
+          text = os.environ.get("NARRATION", "").strip()
+          if not text:
+              raise SystemExit("Narration is empty.")
+          if len(text) > 18000:
+              raise SystemExit(f"Maximum 18,000 characters; received {len(text)}.")
+          Path("narration.txt").write_text(text, encoding="utf-8")
+          PY
+      - name: Generate Gemini WAV
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: |
+          python scripts/generate_gemini_voice.py --input narration.txt --output output/gemini-narration.wav --voice "${{ inputs.voice }}" --style "${{ inputs.style }}" --model "${{ inputs.model }}"
+      - name: Upload voice artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: stickmotion-gemini-voice
+          path: |
+            output/gemini-narration.wav
+            output/gemini-narration.json
+            narration.txt
+          retention-days: 3
