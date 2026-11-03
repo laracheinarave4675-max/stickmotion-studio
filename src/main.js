@@ -85,14 +85,14 @@ function exportSubtitles(){
  let cursor=0;
  const srt=scenes.map((scene,index)=>{
   const start=cursor;cursor+=Math.max(1,Number(scene.duration)||1);
-  return (index+1)+"\\n"+srtTimestamp(start)+" --> "+srtTimestamp(cursor)+"\\n"+scene.narration;
- }).join("\\n\\n")+"\\n";
+  return (index+1)+"\n"+srtTimestamp(start)+" --> "+srtTimestamp(cursor)+"\n"+scene.narration;
+ }).join("\n\n")+"\n";
  const blob=new Blob([srt],{type:"text/plain;charset=utf-8"}),url=URL.createObjectURL(blob),link=document.createElement("a");
  link.href=url;link.download="stickmotion-subtitles.srt";link.click();URL.revokeObjectURL(url);
 }
 function drawNarrationCaption(text){
  if(!text||!$("#burn-captions")?.checked)return;
- const words=String(text).split(/\\s+/),lines=[];let line="";
+ const words=String(text).split(/\s+/),lines=[];let line="";
  for(const word of words){const next=line?line+" "+word:word;if(next.length>58&&line){lines.push(line);line=word}else line=next}
  if(line)lines.push(line);
  const visible=lines.slice(0,2),font=27,lineHeight=37,padX=28,padY=18;
