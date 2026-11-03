@@ -122,6 +122,7 @@ def main():
     ap.add_argument("--narration",required=True,type=Path); ap.add_argument("--voice",required=True,type=Path)
     ap.add_argument("--output",required=True,type=Path)
     ap.add_argument("--music",type=Path,default=Path("output/music.wav"))
+    ap.add_argument("--sfx",type=Path,default=Path("output/sfx.wav"))
     args=ap.parse_args()
     text=args.narration.read_text(encoding="utf-8").strip()
     if not text or len(text)>1800: raise SystemExit("Pilot narration must contain 1–1,800 characters.")
@@ -135,7 +136,7 @@ def main():
     durations=[audio_duration*w/total_words for w in weights]
     args.output.parent.mkdir(parents=True,exist_ok=True)
     lead_visual=scenes[0].get("visual","historical") if scenes else "historical"
-    subprocess.run([sys.executable,"scripts/generate_music.py","--seconds",str(audio_duration),"--visual",lead_visual,"--output",str(args.music)],check=True)
+    subprocess.run([sys.executable,"scripts/generate_music.py","--seconds",str(audio_duration),"--visual",lead_visual,"--output",str(args.music)],check=True)\n    subprocess.run([sys.executable,"scripts/generate_sfx.py","--narration",str(args.narration),"--seconds",str(audio_duration),"--output",str(args.sfx)],check=True)
     srt=[]; cursor=0.0
     for i,(scene,dur) in enumerate(zip(scenes,durations),1):
         start=cursor; cursor+=dur
@@ -144,9 +145,9 @@ def main():
             return f"{h:02}:{m:02}:{sec:02},{ms:03}"
         srt.append(f"{i}\n{stamp(start)} --> {stamp(cursor)}\n{scene['narration']}\n")
     srt_path=args.output.with_suffix(".srt"); srt_path.write_text("\n".join(srt),encoding="utf-8")
-    meta={"renderer":"Pillow vector animation + FFmpeg","resolution":"1920x1080","fps":FPS,"audio_seconds":round(audio_duration,3),"scene_count":len(scenes),"voice":"Gemini WAV supplied","captions":"burned in; scene-weighted timing","music":"original procedural cinematic underscore, automatically ducked under narration","limitations":["procedural stick-figure animation, not generative character animation","music is synthesized ambience, not a recorded orchestral score; no spot sound effects yet","scene timing is estimated by narration word count"]}
+    meta={"renderer":"Pillow vector animation + FFmpeg","resolution":"1920x1080","fps":FPS,"audio_seconds":round(audio_duration,3),"scene_count":len(scenes),"voice":"Gemini WAV supplied","captions":"burned in; scene-weighted timing","music":"original procedural cinematic underscore, automatically ducked under narration","sound_effects":"original procedural cues selected from narration events","limitations":["procedural stick-figure animation, not generative character animation","sound effects are synthetic cues, not detailed recorded foley","scene timing is estimated by narration word count"]}
     args.output.with_suffix(".json").write_text(json.dumps(meta,indent=2),encoding="utf-8")
-    cmd=["ffmpeg","-y","-f","rawvideo","-pix_fmt","rgb24","-s",f"{W}x{H}","-r",str(FPS),"-i","-","-i",str(args.voice),"-i",str(args.music),"-filter_complex","[2:a]volume=0.24[bed];[bed][1:a]sidechaincompress=threshold=0.025:ratio=8:attack=20:release=550[ducked];[1:a][ducked]amix=inputs=2:duration=first:dropout_transition=2[aout]","-map","0:v:0","-map","[aout]","-c:v","libx264","-preset","ultrafast","-crf","22","-pix_fmt","yuv420p","-c:a","aac","-b:a","192k","-shortest","-movflags","+faststart",str(args.output)]
+    cmd=["ffmpeg","-y","-f","rawvideo","-pix_fmt","rgb24","-s",f"{W}x{H}","-r",str(FPS),"-i","-","-i",str(args.voice),"-i",str(args.music),"-i",str(args.sfx),"-filter_complex","[2:a]volume=0.24[bed];[bed][1:a]sidechaincompress=threshold=0.025:ratio=8:attack=20:release=550[ducked];[3:a]volume=0.65[sfx];[1:a][ducked][sfx]amix=inputs=3:duration=first:dropout_transition=2:normalize=0,alimiter=limit=0.95[aout]","-map","0:v:0","-map","[aout]","-c:v","libx264","-preset","ultrafast","-crf","22","-pix_fmt","yuv420p","-c:a","aac","-b:a","192k","-shortest","-movflags","+faststart",str(args.output)]
     proc=subprocess.Popen(cmd,stdin=subprocess.PIPE)
     frame_index=0; scene_index=0; scene_start=0
     try:
