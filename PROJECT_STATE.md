@@ -1,6 +1,6 @@
 # StickMotion Studio — Project State
 
-Last updated: 2026-11-03 (milestone: hand-held prop animation)
+Last updated: 2026-11-03 (milestone: first real browser video export path)
 
 ## Product direction (confirmed)
 This is a story-animation studio, not a space/science video maker. The intended channel subjects include history, survival stories, true crime, investigations, disasters, wars, mysteries, and related narrative documentaries.
@@ -50,3 +50,13 @@ Verify CI for 17d8d7c2. Then make held props and gestures semantically selective
 
 ## Development rule
 Never confuse a successful static-site deployment with a finished video generator. Record test results, known limitations, and next action here after each milestone.
+
+
+## 2026-11-03 continued milestone — animated WebM export
+- Added a browser-side animated preview export using canvas.captureStream(30) and MediaRecorder. It records the storyboard scenes in sequence and downloads a silent WebM file. This is a real video-file export path, not MP4 and not a full production render; it has no narration, music, SFX or subtitles.
+- Added an Export video control and live status text. Export runs in real time; keep the page open. Browser support and memory limits vary, so start with short storyboards.
+- Added planner actions: opening/unlocking, picking up/collecting, helping/rescuing, reaching/handing over, plus unit tests.
+- Commits: UI/export 8a6961a3, action rules ef07948b, newline/regex fixes 0f265075 and 3cb1c619.
+- Earlier run 41723433478 passed syntax and all tests; only Pages setup failed because Pages is not enabled.
+- Latest CI for the WebM and action-rule commits is pending verification.
+- Next: add scene duration and total runtime display, robust export cancellation/error cleanup, and test WebM output on Android. Then add generated voice/subtitles and a server-side MP4 path.
