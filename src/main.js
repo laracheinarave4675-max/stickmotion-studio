@@ -1,4 +1,5 @@
 import { buildScenePlan } from "./scene-planner.js";
+import { buildSrt, wrapCaption } from "./subtitles.js";
 const $ = (selector) => document.querySelector(selector);
 const canvas = $("#stage");
 const ctx = canvas.getContext("2d");
@@ -76,25 +77,15 @@ function formatTime(seconds){
  const whole=Math.max(0,Math.round(seconds)),hours=Math.floor(whole/3600),minutes=Math.floor((whole%3600)/60),secs=whole%60;
  return hours?hours+":"+String(minutes).padStart(2,"0")+":"+String(secs).padStart(2,"0"):minutes+":"+String(secs).padStart(2,"0");
 }
-function srtTimestamp(seconds){
- const ms=Math.max(0,Math.round(seconds*1000)),hours=Math.floor(ms/3600000),minutes=Math.floor(ms%3600000/60000),secs=Math.floor(ms%60000/1000),millis=ms%1000;
- return String(hours).padStart(2,"0")+":"+String(minutes).padStart(2,"0")+":"+String(secs).padStart(2,"0")+","+String(millis).padStart(3,"0");
-}
 function exportSubtitles(){
  if(!scenes.length)return;
- let cursor=0;
- const srt=scenes.map((scene,index)=>{
-  const start=cursor;cursor+=Math.max(1,Number(scene.duration)||1);
-  return (index+1)+"\n"+srtTimestamp(start)+" --> "+srtTimestamp(cursor)+"\n"+scene.narration;
- }).join("\n\n")+"\n";
+ const srt=buildSrt(scenes);
  const blob=new Blob([srt],{type:"text/plain;charset=utf-8"}),url=URL.createObjectURL(blob),link=document.createElement("a");
  link.href=url;link.download="stickmotion-subtitles.srt";link.click();URL.revokeObjectURL(url);
 }
 function drawNarrationCaption(text){
  if(!text||!$("#burn-captions")?.checked)return;
- const words=String(text).split(/\s+/),lines=[];let line="";
- for(const word of words){const next=line?line+" "+word:word;if(next.length>58&&line){lines.push(line);line=word}else line=next}
- if(line)lines.push(line);
+ const lines=wrapCaption(text);
  const visible=lines.slice(0,2),font=27,lineHeight=37,padX=28,padY=18;
  ctx.save();ctx.font="600 "+font+"px system-ui, sans-serif";ctx.textAlign="center";ctx.textBaseline="middle";
  const width=Math.min(1120,Math.max(280,Math.max(...visible.map(value=>ctx.measureText(value).width))+padX*2));
