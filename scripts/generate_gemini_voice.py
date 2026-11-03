@@ -15,7 +15,7 @@ SAMPLE_WIDTH = 2
 MAX_CHARACTERS = 18000
 CHUNK_CHARACTERS = 2800
 DEFAULT_MODEL = "gemini-2.5-flash-preview-tts"
-DEFAULT_VOICE = "Kore"
+DEFAULT_VOICE = "Charon"
 
 def validate_narration(text: str) -> str:
     cleaned = text.strip()
