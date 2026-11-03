@@ -91,3 +91,13 @@ Never confuse a successful static-site deployment with a finished video generato
 - Commits: subtitles module dd3dedf6; main integration d8803741; tests 13ef79da.
 - CI for this refactor is pending; do not treat it as validated until the latest Actions run completes.
 - Known limitation: cue timing follows estimated scene durations and each narration sentence remains a single cue; no word-level forced alignment.
+
+## 2026-11-03 continued milestone — subtitle hardening and CI coverage
+- Expanded npm run check to syntax-check src/subtitles.js as well as the main UI and scene planner.
+- Hardened caption wrapping for unusually long unbroken words; added tests for long words and empty SRT output.
+- Fixed word-boundary detection in character prop-interaction matching so carry/hold/use language is interpreted as intended.
+- Updated README to describe current browser WebM and SRT capabilities and clearly state remaining limitations.
+- Commits: syntax check b244fcd5; caption edge cases 0ec15544; interaction regex be3fb6bf; tests b6cff218; README e1ed430e.
+- Previous subtitle utility CI run 41725786586 completed successfully. Latest expanded test run was triggered by b6cff218 and is pending at the time of this log; README update subsequently triggered another run.
+- Current output remains silent WebM plus optional burned captions and a separate scene-estimated SRT. No TTS, music/SFX, word-level alignment or MP4 render pipeline exists yet.
+- Next major engineering step: build a bounded 60-second cloud render proof-of-concept using free/open-source TTS and FFmpeg, with strict artifact/runtime limits before considering longer videos.
