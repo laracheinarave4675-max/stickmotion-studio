@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import { buildScenePlan, classifyScene, makeTitle, splitNarration } from "../src/scene-planner.js";
 
 test("splits narration into sentence and paragraph beats", () => {
-  assert.deepEqual(splitNarration("First sentence. Second sentence!\\nA new paragraph?"), ["First sentence.", "Second sentence!", "A new paragraph?"]);
+  assert.deepEqual(splitNarration("First sentence. Second sentence!\nA new paragraph?"), ["First sentence.", "Second sentence!", "A new paragraph?"]);
 });
 test("recognizes history and ancient civilizations", () => {
   assert.equal(classifyScene("The Roman empire expanded across Europe.").visual, "historical");
