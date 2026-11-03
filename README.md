@@ -35,3 +35,13 @@ Open index.html in a modern browser, or serve this folder with a static web serv
 
 ## Deployment
 Enable GitHub Pages in repository Settings → Pages and choose GitHub Actions as the source.
+
+## Short narration voice test (free cloud workflow)
+
+The repository includes an optional manual Piper TTS workflow. It runs on a GitHub-hosted CPU runner and does not require a paid TTS API or a secret key.
+
+1. Open [Actions → Generate short narration voice](https://github.com/laracheinarave4675-max/stickmotion-studio/actions/workflows/generate-voice.yml).
+2. Choose **Run workflow**, paste a short English narration (maximum 1,200 characters), and choose a Piper voice.
+3. Wait for the workflow to finish, open its run, and download the `stickmotion-piper-voice` artifact. It contains a WAV file, metadata JSON and the input text.
+
+This is a bounded prototype, not a 15-minute production service. GitHub Actions availability and usage limits apply. Piper is an open-source engine; individual voice model terms should be checked before commercial use. The generated WAV is not yet automatically merged into the browser WebM export or an MP4.
