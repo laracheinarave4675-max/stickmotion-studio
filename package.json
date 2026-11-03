@@ -1,0 +1,14 @@
+{
+  "name": "stickmotion-studio",
+  "version": "0.2.0",
+  "private": true,
+  "type": "module",
+  "description": "A mobile-first stick-figure storyboard and animation prototype.",
+  "scripts": {
+    "check": "node --check src/main.js && node --check src/scene-planner.js",
+    "test": "node --test"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
