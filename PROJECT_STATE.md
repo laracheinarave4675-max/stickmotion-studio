@@ -114,3 +114,12 @@ Never confuse a successful static-site deployment with a finished video generato
 - Piper workflow retained as a no-key fallback. README now documents Gemini workflow and key setup.
 - Important validation boundary: code and unit tests are wired into CI, but the Gemini workflow has not yet been run with a real API key. No Gemini WAV exists yet; no real voice quality, quota, chunk-join continuity, or 15-minute duration is verified. Audio is still not merged into MP4.
 - Next: inspect CI result; then user adds a free Gemini API key in GitHub Actions secrets and runs a 1–2 minute sample first. Listen to the WAV and compare it with Piper before selecting a default. After voice acceptance, integrate narration WAV + SRT with a bounded 60-second FFmpeg MP4 renderer.
+
+
+## 2026-11-03 — narrator voice selection updated
+- User listened to the first Gemini TTS sample and approved its quality, but requested a male narrator instead of the female Kore voice.
+- Changed Gemini generator default voice from Kore to Charon.
+- Changed workflow choices to male voices only: Charon, Iapetus, Rasalgethi, Algieba, Orus, Alnilam, Schedar, Sadaltager, Fenrir and Puck.
+- Charon is the recommended documentary default: Google lists it as male and describes it as informative. Iapetus is a clear alternative; Rasalgethi is another informative option. Source: Google Gemini TTS voice documentation.
+- Updated default delivery direction to measured, warm, authoritative documentary narration without exaggerated announcer delivery.
+- User's first female-voice sample was approved for quality. Male Charon has not yet been generated/listened to; the next run should verify the chosen male timbre before locking it for production.
