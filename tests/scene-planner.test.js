@@ -1,6 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { buildScenePlan, classifyScene, makeTitle, splitNarration } from "../src/scene-planner.js";
+import { buildSrt, formatSrtTimestamp, wrapCaption } from "../src/subtitles.js";
 
 test("splits narration into sentence and paragraph beats", () => {
   assert.deepEqual(splitNarration("First sentence. Second sentence!\nA new paragraph?"), ["First sentence.", "Second sentence!", "A new paragraph?"]);
@@ -48,4 +49,17 @@ test("recognizes direct object interaction actions", () => {
   assert.equal(classifyScene("He opened the heavy cell door with a key.").action, "opening or unlocking");
   assert.equal(classifyScene("She picked up the evidence folder.").action, "picking up or collecting");
   assert.equal(classifyScene("The sailor rescued his friend from the water.").action, "helping or rescuing");
+});
+
+test("formats subtitle timestamps and builds sequential SRT cues", () => {
+  assert.equal(formatSrtTimestamp(3661.25), "01:01:01,250");
+  assert.equal(buildSrt([
+    { narration: "First beat.", duration: 4 },
+    { narration: "Second beat.", duration: 3 }
+  ]), "1\\n00:00:00,000 --> 00:00:04,000\\nFirst beat.\\n\\n2\\n00:00:04,000 --> 00:00:07,000\\nSecond beat.\\n");
+});
+test("wraps captions and limits them to two readable lines", () => {
+  const lines = wrapCaption("one two three four five six seven eight nine ten eleven twelve", 15, 2);
+  assert.equal(lines.length, 2);
+  assert.ok(lines[1].endsWith("…"));
 });
