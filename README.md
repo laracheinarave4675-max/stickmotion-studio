@@ -6,14 +6,17 @@ A mobile-first animated storytelling studio for history, survival, true crime, i
 - Responsive script editor for phone screens.
 - Sentence-to-scene storyboard planner.
 - Genre-aware visual classification: history, crime, investigation, survival, desert, shipwreck, wilderness, war, disaster, prison, night, conversation and journey.
-- Expressive stick-figure preview, scene navigation and JSON export.
+- Expressive stick-figure preview, scene navigation and JSON scene-plan export.
+- Browser-side animated WebM preview export (real-time recording; silent).
+- Optional burned-in narration captions and separate scene-timed SRT export.
+- Estimated storyboard runtime, export progress and cancellation.
 - Dependency-free Node.js unit tests.
 
 ## Visual direction
 Expressive hand-drawn stick figures with bold black outlines, readable faces, purposeful props and environments designed for each narration beat. Avoid unrelated stock footage and avoid defaulting to space imagery. The scene should communicate what the narration is describing.
 
 ## Current limitations
-The planner is rule-based, not an AI model. The current preview is a prototype, not a rendered video. Natural English narration, word-level subtitles, sound effects, music mixing and MP4 rendering are not connected yet.
+The planner is rule-based, not an AI model. The current animation is procedural and the browser export is silent WebM, not MP4. SRT and burned-in captions use estimated scene timing, not word-level alignment. Natural English narration, music, sound effects, audio mixing and server-side MP4 rendering are not connected yet.
 
 ## Output target
 1920x1080, 16:9, 30fps, MP4 plus separate SRT.
@@ -28,7 +31,7 @@ The planner is rule-based, not an AI model. The current preview is a prototype, 
 See [PROJECT_STATE.md](PROJECT_STATE.md) for the durable project log and current next steps.
 
 ## Run locally
-Open index.html in a modern browser, or serve this folder with a static web server. Run tests with `npm test`.
+Open index.html in a modern browser, or serve this folder with a static web server. Run syntax checks with `npm run check` and tests with `npm test`.
 
 ## Deployment
 Enable GitHub Pages in repository Settings → Pages and choose GitHub Actions as the source.
