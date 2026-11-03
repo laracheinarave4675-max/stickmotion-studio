@@ -29,9 +29,10 @@ jobs:
       - name: Run scene planner tests
         run: npm test
       - name: Check Python voice generator syntax
-        run: python -m py_compile scripts/generate_voice.py tests/test_generate_voice.py
+        run: python -m py_compile scripts/generate_voice.py scripts/generate_gemini_voice.py tests/test_generate_voice.py tests/test_generate_gemini_voice.py
       - name: Test voice input validation
         run: python tests/test_generate_voice.py
+          python tests/test_generate_gemini_voice.py
       - name: Configure Pages
         uses: actions/configure-pages@v5
       - name: Upload site
