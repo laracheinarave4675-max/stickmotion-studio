@@ -134,3 +134,11 @@ Never confuse a successful static-site deployment with a finished video generato
 - The Charon voice workflow was successfully run by the user (Gemini workflow run 41731303521, conclusion success). The user has approved Charon as the fixed default narrator voice.
 - New commits: renderer 3004d863; pilot workflow 05dcd419.
 - Next: verify Pages CI after these commits, run the new pilot workflow with a short narration, inspect MP4 metadata and representative frames, fix any rendering defects, then extend limits toward 5 minutes and 15 minutes.
+
+
+## 2026-11-03 follow-up — renderer regression coverage
+- Fixed caption handling so long narration sentences rotate through two-line caption pages rather than silently truncating after the first two lines.
+- Expanded action-pose mapping for object handoffs, rescue, discovery, climbing and water struggle; improved prop drawing for photographs, notes and rafts.
+- Added `tests/test_render_video.py` to verify the Node scene-planner contract, a real 1920×1080 RGB frame, and multi-page long-caption handling.
+- Pages CI now installs Pillow and runs the renderer regression tests in addition to existing JS and TTS tests.
+- Validation status: waiting for the latest Pages CI run. The cloud MP4 pilot has not yet been dispatched and no MP4 artifact has been verified.
