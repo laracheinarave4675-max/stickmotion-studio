@@ -101,3 +101,5 @@ Never confuse a successful static-site deployment with a finished video generato
 - Previous subtitle utility CI run 41725786586 completed successfully. Latest expanded test run was triggered by b6cff218 and is pending at the time of this log; README update subsequently triggered another run.
 - Current output remains silent WebM plus optional burned captions and a separate scene-estimated SRT. No TTS, music/SFX, word-level alignment or MP4 render pipeline exists yet.
 - Next major engineering step: build a bounded 60-second cloud render proof-of-concept using free/open-source TTS and FFmpeg, with strict artifact/runtime limits before considering longer videos.
+
+- Follow-up inspection caught an over-escaped word-boundary regex in the character interaction matcher; corrected it in commit 769f29ef so phrases such as "holding the map" and "using the flashlight" match actual word boundaries.
