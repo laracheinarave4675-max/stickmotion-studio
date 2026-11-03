@@ -68,3 +68,6 @@ The manual **Render StickMotion 60-second MP4 pilot** workflow creates a short n
 This is a deliberately bounded proof of concept: narration is limited to 1,800 characters and rendered audio to 90 seconds. The first renderer uses scene-aware procedural sets, poses, props, simple motion, and burned-in captions; it is not yet a full generative animation system. Music/SFX and precise word-level subtitle alignment are not included. GitHub Actions usage is subject to the account's available minutes and quotas; do not assume unlimited free rendering.
 
 To run it: open **Actions → Render StickMotion 60-second MP4 pilot → Run workflow**, paste a short English narration, keep Charon selected, and download the `stickmotion-mp4-pilot` artifact when the run succeeds. Inspect the actual MP4 before using longer scripts.
+
+
+Renderer notes: long captions are paginated into readable two-line screens during each scene. The CI suite includes a frame-rendering regression test to catch mismatches between the story planner and the MP4 renderer.
