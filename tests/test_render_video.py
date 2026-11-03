@@ -11,7 +11,7 @@ MODULE = importlib.util.module_from_spec(SPEC)
 SPEC.loader.exec_module(MODULE)
 MUSIC_SPEC = importlib.util.spec_from_file_location("generate_music", ROOT / "scripts" / "generate_music.py")
 MUSIC = importlib.util.module_from_spec(MUSIC_SPEC)
-MUSIC_SPEC.loader.exec_module(MUSIC)
+MUSIC_SPEC.loader.exec_module(MUSIC)\nSFX_SPEC = importlib.util.spec_from_file_location("generate_sfx", ROOT / "scripts" / "generate_sfx.py")\nSFX = importlib.util.module_from_spec(SFX_SPEC)\nSFX_SPEC.loader.exec_module(SFX)
 
 class RendererTests(unittest.TestCase):
     def test_scene_planner_contract_and_frame_dimensions(self):
@@ -42,6 +42,14 @@ class RendererTests(unittest.TestCase):
                 self.assertAlmostEqual(audio.getnframes()/audio.getframerate(), 2.0, delta=.01)
             self.assertEqual(meta["style"], "suspense")
             self.assertEqual(meta["source"], "original procedural synthesis")
+
+    def test_sfx_selection_matches_story_events(self):
+        self.assertEqual(SFX.choose("He unlocked the door and entered.", "prison", "opening or unlocking"), "door")
+        self.assertEqual(SFX.choose("The ship was sinking as waves hit the raft.", "shipwreck", "swimming or struggling in water"), "water")
+        self.assertEqual(SFX.choose("He ran across the dark desert.", "desert", "running"), "wind")
+        clip = SFX.cue("impact", .4, 12)
+        self.assertGreater(len(clip), 1000)
+        self.assertTrue(any(clip))
 
 if __name__ == "__main__":
     unittest.main()
