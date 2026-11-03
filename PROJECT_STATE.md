@@ -56,7 +56,8 @@ Never confuse a successful static-site deployment with a finished video generato
 - Added a browser-side animated preview export using canvas.captureStream(30) and MediaRecorder. It records the storyboard scenes in sequence and downloads a silent WebM file. This is a real video-file export path, not MP4 and not a full production render; it has no narration, music, SFX or subtitles.
 - Added an Export video control and live status text. Export runs in real time; keep the page open. Browser support and memory limits vary, so start with short storyboards.
 - Added planner actions: opening/unlocking, picking up/collecting, helping/rescuing, reaching/handing over, plus unit tests.
+- Character rig now has dedicated arm poses for opening, picking up, rescuing and handing/reaching. Prop-in-hand rendering is now conditional on an interaction action or narration that explicitly says carrying/holding/using, reducing unrelated objects appearing in hands.
 - Commits: UI/export 8a6961a3, action rules ef07948b, newline/regex fixes 0f265075 and 3cb1c619.
 - Earlier run 41723433478 passed syntax and all tests; only Pages setup failed because Pages is not enabled.
-- Latest CI for the WebM and action-rule commits is pending verification.
+- Latest CI for WebM/action-rule commits is pending; interaction pose commit fd25ab91 was just pushed and also needs CI verification.
 - Next: add scene duration and total runtime display, robust export cancellation/error cleanup, and test WebM output on Android. Then add generated voice/subtitles and a server-side MP4 path.
