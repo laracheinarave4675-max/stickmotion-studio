@@ -19,7 +19,16 @@ export function buildSrt(scenes) {
 }
 
 export function wrapCaption(text, maxChars = 58, maxLines = 2) {
-  const words = String(text ?? "").trim().split(/\s+/).filter(Boolean);
+  const sourceWords = String(text ?? "").trim().split(/\\s+/).filter(Boolean);
+  const words = sourceWords.flatMap((word) => {
+    if (word.length <= maxChars) return [word];
+    const chunks = [];
+    for (let index = 0; index < word.length; index += maxChars - 1) {
+      const part = word.slice(index, index + maxChars - 1);
+      chunks.push(part + (index + maxChars - 1 < word.length ? "-" : ""));
+    }
+    return chunks;
+  });
   const lines = [];
   let line = "";
   for (const word of words) {
@@ -33,7 +42,7 @@ export function wrapCaption(text, maxChars = 58, maxLines = 2) {
   if (lines.length > maxLines) {
     const visible = lines.slice(0, maxLines);
     const last = visible[maxLines - 1];
-    visible[maxLines - 1] = last.length > maxChars - 1
+    visible[maxLines - 1] = last.length >= maxChars
       ? last.slice(0, maxChars - 1).trimEnd() + "…"
       : last + "…";
     return visible;
