@@ -160,4 +160,11 @@ Never confuse a successful static-site deployment with a finished video generato
 - The pilot artifact now includes the SFX WAV. Added tests for cue selection by story content and generated signal output.
 - Boundary: these are synthetic design cues, not detailed recorded Foley or cinematic battle/ambience recordings. Actual listening/mix review is still required; no rendered MP4 has been inspected yet.
 - Previous CI run after adding soundtrack (41735219485) succeeded. CI for this SFX batch is pending.
-- Next validation: check Actions test/deploy outcome; then run the short manual MP4 pilot once and inspect real playback before expanding video duration. 
+- Next validation: check Actions test/deploy outcome; then run the short manual MP4 pilot once and inspect real playback before expanding video duration.
+
+## 2026-11-03 — first successful MP4 pilot and CI follow-up
+- Manual workflow `Render StickMotion 60-second MP4 pilot` completed successfully on commit `c28e9cff05f87a8e00c23f1980627916bd330457`; run ID `41737208677`.
+- Confirmed successful steps: dependency installation, narration validation, Gemini Charon voice generation, animated MP4/SRT render, and artifact upload. Artifact `stickmotion-mp4-pilot` exists (10,262,182 bytes) and expires 2026-11-06. This verifies the pipeline produced and uploaded its outputs, but visual/audio quality has not yet been inspected.
+- The separate Pages/CI run `41736998951` passed JavaScript syntax checks and all 13 Node tests, then failed at Python compilation because `tests/test_render_video.py` contained literal escaped newline sequences between the music and SFX imports.
+- Fixed those separators as real source newlines in commit `6ee782a6a5c8e04a9a4ab002ddc08e6ace8b1628`. CI for this fix must still be checked; do not mark the full CI green until then.
+- Next: user downloads and uploads the MP4 from the successful pilot artifact for frame-by-frame, audio, subtitle and pacing review; independently verify the CI run triggered by the test fix.
