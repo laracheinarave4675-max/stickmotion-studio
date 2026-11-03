@@ -152,3 +152,12 @@ Never confuse a successful static-site deployment with a finished video generato
 - This is original synthesized underscore, not a professional recorded score. Actual perceptual balance and music quality still need listening against a real rendered MP4. No MP4 pilot has yet been run/inspected.
 - Latest Pages CI before this change: run 41734004410 succeeded, including JavaScript/Python checks, planner and renderer tests, and GitHub Pages deployment.
 - Next: confirm CI after soundtrack integration, then run the short MP4 pilot and inspect the actual video/audio before expanding runtime or adding more elaborate SFX.
+
+
+## 2026-11-03 milestone — narration-aware synthetic sound effects
+- Added `scripts/generate_sfx.py`: reads the narration and planned scenes, selects simple original synthetic cues for matching events (door/key, footsteps, water, wind, impact, fire, reveal), and places them at the corresponding scene time. It generates stereo PCM directly; no sample library or paid SFX service is required.
+- Integrated SFX into the MP4 audio mixer alongside Charon voice and procedural music. The music is ducked under speech; SFX sit at a restrained level and the final mix has a limiter.
+- The pilot artifact now includes the SFX WAV. Added tests for cue selection by story content and generated signal output.
+- Boundary: these are synthetic design cues, not detailed recorded Foley or cinematic battle/ambience recordings. Actual listening/mix review is still required; no rendered MP4 has been inspected yet.
+- Previous CI run after adding soundtrack (41735219485) succeeded. CI for this SFX batch is pending.
+- Next validation: check Actions test/deploy outcome; then run the short manual MP4 pilot once and inspect real playback before expanding video duration. 
