@@ -32,7 +32,11 @@ const PROP_RULES = [
   ["clock", /\b(clock|time|hour|minute|deadline)\b/]
 ];
 
-const ACTION_RULES = [\n  ["opening or unlocking", /\\b(open|opened|opening|unlock|unlocked|unlocked|turn the key)\\b/],\n  ["picking up or collecting", /\\b(pick up|picked up|grab|grabbed|collect|collected|lift|lifted)\\b/],\n  ["helping or rescuing", /\\b(help|helped|rescue|rescued|pull|pulled|carry|carried|drag|dragged)\\b/],\n  ["reaching or handing over", /\\b(reach|reached|hand|handed|give|gave|pass|passed)\\b/],
+const ACTION_RULES = [
+  ["opening or unlocking", /\b(open|opened|opening|unlock|unlocked|unlocked|turn the key)\b/],
+  ["picking up or collecting", /\b(pick up|picked up|grab|grabbed|collect|collected|lift|lifted)\b/],
+  ["helping or rescuing", /\b(help|helped|rescue|rescued|pull|pulled|carry|carried|drag|dragged)\b/],
+  ["reaching or handing over", /\b(reach|reached|hand|handed|give|gave|pass|passed)\b/],
   ["running", /\b(run|ran|running|flee|fled|fleeing|chase|chased|chasing|escape|escaping)\b/],
   ["walking or travelling", /\b(walk|walking|travel|journey|march|cross|approach)\b/],
   ["searching for clues", /\b(search|searching|investigat|examine|inspect|look for|track|tracking)\b/],
@@ -63,7 +67,8 @@ function firstMatch(value, rules, fallback) {
 }
 
 export function splitNarration(text) {
-  return String(text ?? "").replace(/\r/g, "").split(/(?<=[.!?])\s+|\n+/).map((part) => part.trim()).filter(Boolean);
+  return String(text ?? "").replace(/\r/g, "").split(/(?<=[.!?])\s+|
++/).map((part) => part.trim()).filter(Boolean);
 }
 
 export function classifyScene(text) {
