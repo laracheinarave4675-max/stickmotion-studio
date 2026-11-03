@@ -67,7 +67,7 @@ function firstMatch(value, rules, fallback) {
 }
 
 export function splitNarration(text) {
-  return String(text ?? "").replace(/\r/g, "").split(/\s+|\n+/).map((part) => part.trim()).filter(Boolean);
+  return String(text ?? "").replace(/\r/g, "").split(/(?<=[.!?])\s+|\n+/).map((part) => part.trim()).filter(Boolean);
 }
 export function classifyScene(text) {
   const value = String(text ?? "").toLowerCase();
