@@ -31,7 +31,7 @@ class GeminiNarrationTests(unittest.TestCase):
         import wave
         with tempfile.TemporaryDirectory() as tmp:
             path = Path(tmp) / "voice.wav"
-            MODULE.write_wav(path, [b"\\x00\\x00" * 240])
+            MODULE.write_wav(path, [b"\x00\x00" * 240])
             with wave.open(str(path), "rb") as wav:
                 self.assertEqual(wav.getframerate(), 24000)
                 self.assertEqual(wav.getnchannels(), 1)
