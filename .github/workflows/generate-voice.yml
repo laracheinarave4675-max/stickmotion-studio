@@ -1,0 +1,58 @@
+name: Generate short narration voice
+on:
+  workflow_dispatch:
+    inputs:
+      narration:
+        description: English narration (maximum 1,200 characters; short test only)
+        required: true
+        type: string
+      voice:
+        description: Piper English voice
+        required: true
+        default: en_US-lessac-medium
+        type: choice
+        options:
+          - en_US-lessac-medium
+          - en_US-amy-medium
+permissions:
+  contents: read
+  actions: read
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install Piper
+        run: python -m pip install --disable-pip-version-check piper-tts
+      - name: Save narration input
+        env:
+          NARRATION: ${{ inputs.narration }}
+        run: |
+          python - <<'PY'
+          import os
+          from pathlib import Path
+          text = os.environ.get("NARRATION", "").strip()
+          if not text:
+              raise SystemExit("Narration is empty.")
+          if len(text) > 1200:
+              raise SystemExit(f"Maximum 1,200 characters; received {len(text)}.")
+          Path("narration.txt").write_text(text, encoding="utf-8")
+          PY
+      - name: Generate WAV with Piper
+        run: |
+          python scripts/generate_voice.py --input narration.txt --output output/narration.wav --voice "${{ inputs.voice }}"
+      - name: Upload voice artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: stickmotion-piper-voice
+          path: |
+            output/narration.wav
+            output/narration.json
+            narration.txt
+          retention-days: 3
