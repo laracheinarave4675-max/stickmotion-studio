@@ -142,3 +142,13 @@ Never confuse a successful static-site deployment with a finished video generato
 - Added `tests/test_render_video.py` to verify the Node scene-planner contract, a real 1920×1080 RGB frame, and multi-page long-caption handling.
 - Pages CI now installs Pillow and runs the renderer regression tests in addition to existing JS and TTS tests.
 - Validation status: waiting for the latest Pages CI run. The cloud MP4 pilot has not yet been dispatched and no MP4 artifact has been verified.
+
+
+## 2026-11-03 milestone — original soundtrack and narration ducking
+- Added `scripts/generate_music.py`, a dependency-free procedural music synthesizer that creates an original stereo 24 kHz PCM underscore without stock tracks or sampled copyrighted music. It selects a broad mood family from the opening scene (suspense/minor/epic) and creates a gentle evolving harmonic bed.
+- Integrated soundtrack generation into the MP4 renderer. FFmpeg now automatically ducks the music when narration is present, then mixes both into the final AAC track; the voice remains the foreground.
+- The pilot artifact now also includes `music.wav`; metadata records the soundtrack method and clearly notes that recorded spot SFX are not yet included.
+- Added regression coverage for WAV channel count, sample format, sample rate, duration and mood selection.
+- This is original synthesized underscore, not a professional recorded score. Actual perceptual balance and music quality still need listening against a real rendered MP4. No MP4 pilot has yet been run/inspected.
+- Latest Pages CI before this change: run 41734004410 succeeded, including JavaScript/Python checks, planner and renderer tests, and GitHub Pages deployment.
+- Next: confirm CI after soundtrack integration, then run the short MP4 pilot and inspect the actual video/audio before expanding runtime or adding more elaborate SFX.
