@@ -123,3 +123,14 @@ Never confuse a successful static-site deployment with a finished video generato
 - Charon is the recommended documentary default: Google lists it as male and describes it as informative. Iapetus is a clear alternative; Rasalgethi is another informative option. Source: Google Gemini TTS voice documentation.
 - Updated default delivery direction to measured, warm, authoritative documentary narration without exaggerated announcer delivery.
 - User's first female-voice sample was approved for quality. Male Charon has not yet been generated/listened to; the next run should verify the chosen male timbre before locking it for production.
+
+
+## 2026-11-03 milestone — first cloud MP4 renderer implemented (validation pending)
+- Added `scripts/render_video.py`: uses the existing JavaScript scene planner to convert narration into scene-aware shots, draws animated stick figures and simple contextual sets/props with Pillow at 1920×1080/30fps, burns in scene-timed narration captions, and streams frames into FFmpeg to mux the generated mono WAV into H.264/AAC MP4.
+- Added manual workflow `.github/workflows/render-pilot.yml`: accepts 1–1,800 narration characters, generates a Gemini TTS WAV using the selected male voice (default Charon), rejects rendered audio longer than 90 seconds, creates MP4/SRT/JSON metadata, and uploads a 3-day artifact.
+- This is the first server-side MP4 path and removes the need for the user's phone browser to render frames. It is a bounded prototype, not yet a polished full video product.
+- Visuals are procedural stick-figure animation with scene-category backgrounds, selected props, action poses and limited motion; no AI-generated character animation, music/SFX, or word-level subtitle alignment yet. Captions are scene-timed based on narration word counts.
+- Target render is 1080p/30fps. Runtime, memory, actual MP4 playback, audio sync and visual quality are not yet validated; do not scale beyond the short pilot until an actual artifact is inspected.
+- The Charon voice workflow was successfully run by the user (Gemini workflow run 41731303521, conclusion success). The user has approved Charon as the fixed default narrator voice.
+- New commits: renderer 3004d863; pilot workflow 05dcd419.
+- Next: verify Pages CI after these commits, run the new pilot workflow with a short narration, inspect MP4 metadata and representative frames, fix any rendering defects, then extend limits toward 5 minutes and 15 minutes.
