@@ -61,3 +61,15 @@ Never confuse a successful static-site deployment with a finished video generato
 - Earlier run 41723433478 passed syntax and all tests; only Pages setup failed because Pages is not enabled.
 - Latest CI for WebM/action-rule commits is pending; interaction pose commit fd25ab91 was just pushed and also needs CI verification.
 - Next: add scene duration and total runtime display, robust export cancellation/error cleanup, and test WebM output on Android. Then add generated voice/subtitles and a server-side MP4 path.
+
+## 2026-11-03 continued milestone — export controls and first successful Pages deployment
+- User enabled GitHub Pages source as GitHub Actions in repository settings (confirmed by screenshot); this removed the previous Pages configuration blocker.
+- Fixed malformed newline in the example narration string in src/main.js.
+- Fixed splitNarration in src/scene-planner.js to split at sentence boundaries and paragraph breaks without breaking sentences into individual words.
+- Fixed escaped-newline corruption in tests/scene-planner.test.js, including the paragraph-break test and direct object-interaction tests.
+- Added estimated total storyboard duration beside the scene count.
+- Hardened animated WebM export: progress status, Cancel control, empty-file/error handling, track cleanup, and restoration of the selected scene/playback state after completion or cancellation.
+- Current export remains silent WebM recorded in real time; no narration, music, SFX, subtitles, or MP4 encoding.
+- Latest validated commit before this log: c587fc33.
+- GitHub Actions run 41724933422 completed successfully: JavaScript syntax check passed, all scene planner tests passed, Pages configuration passed, artifact upload passed, and deployment passed.
+- Remaining: validate the deployed page and WebM export on Android; then build the 60-second voice/subtitle/MP4 pipeline before scaling.
