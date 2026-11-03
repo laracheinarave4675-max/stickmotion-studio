@@ -1,6 +1,6 @@
 # StickMotion Studio — Project State
 
-Last updated: 2026-11-03 (milestone: story-aware scene planning)
+Last updated: 2026-11-03 (milestone: first action-driven character poses)
 
 ## Product direction (confirmed)
 This is a story-animation studio, not a space/science video maker. The intended channel subjects include history, survival stories, true crime, investigations, disasters, wars, mysteries, and related narrative documentaries.
@@ -18,19 +18,20 @@ Keep the reference look: expressive hand-drawn stick figures, bold black outline
 
 ## Current implementation (2026-11-03)
 - Mobile-first static web UI.
-- Sentence-based scene planner in src/scene-planner.js, now extracting a suggested action, props, setting, camera framing and transition for each narration beat.
+- Sentence-based scene planner in src/scene-planner.js extracts suggested action, props, setting, camera framing and transition for each narration beat. Past-tense movement verbs (ran/fled/chased) are included.
 - Rule-based scene categories: historical, crime, investigation, prison, survival, desert, shipwreck, wilderness, war, disaster, night, conversation, journey and generic explanatory scenes.
 - Canvas preview now includes hand-drawn procedural backdrops for historical settings, crime scenes, evidence boards, survival landscapes, deserts, shipwrecks, wilderness, battlefields, disaster aftermath and prison cells.
 - Example script now demonstrates a Titanic-style shipwreck survival story.
-- CI JavaScript syntax check and scene-planner tests passed on commit b73b794. The workflow then fails only at Configure Pages because GitHub Pages is not enabled in repository settings. A new story-planning test run is pending after the latest changes.
+- CI syntax check passed. Story-planner test run on 53762fed found one real test gap: past-tense 'ran' was not mapped to running; added ran/fled/chased variants in commit 3caa2bb9. The latest test run after this correction and character-animation changes is pending. Earlier CI run b73b794 had all tests passing and failed only at Configure Pages because Pages is not enabled.
 - Canvas stick-figure preview with play/pause and scene navigation.
-- JSON scene-plan export now includes setting, action, props, camera and transition fields alongside narration, mood, visual category and duration.
+- JSON scene-plan export includes setting, action, props, camera and transition fields alongside narration, mood, visual category and duration.
+- Canvas character rig now changes arm poses for running/fighting, searching, hiding and climbing; walking/running animate leg stride. Basic drawn props include water bottle, map, keys, evidence folder and flashlight.
 - Node built-in unit tests in tests/scene-planner.test.js.
 - GitHub Pages workflow exists; Pages deployment still requires Pages source to be enabled in repository settings.
 - No TTS, word-level subtitle alignment, AI semantic planner, sound design, or MP4 renderer is integrated yet.
 
 ## Current milestone
-Verify the latest CI run for the story-aware planner. Then connect extracted actions and props to visible character gestures and scene objects in the canvas. The earlier space-oriented visuals are no longer the product direction. Keep the project-state file updated after meaningful changes.
+Verify the latest CI run after the action-driven pose changes. Then add more scene-specific prop drawings and refine character interaction/positioning so actions connect to the actual environment. The earlier space-oriented visuals are no longer the product direction. Keep the project-state file updated after meaningful changes.
 
 ## Next milestones
 1. Scene-specific sets, props, camera framing and character actions for the target genres.
