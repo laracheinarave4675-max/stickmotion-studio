@@ -136,7 +136,8 @@ def main():
     durations=[audio_duration*w/total_words for w in weights]
     args.output.parent.mkdir(parents=True,exist_ok=True)
     lead_visual=scenes[0].get("visual","historical") if scenes else "historical"
-    subprocess.run([sys.executable,"scripts/generate_music.py","--seconds",str(audio_duration),"--visual",lead_visual,"--output",str(args.music)],check=True)\n    subprocess.run([sys.executable,"scripts/generate_sfx.py","--narration",str(args.narration),"--seconds",str(audio_duration),"--output",str(args.sfx)],check=True)
+    subprocess.run([sys.executable,"scripts/generate_music.py","--seconds",str(audio_duration),"--visual",lead_visual,"--output",str(args.music)],check=True)
+    subprocess.run([sys.executable,"scripts/generate_sfx.py","--narration",str(args.narration),"--seconds",str(audio_duration),"--output",str(args.sfx)],check=True)
     srt=[]; cursor=0.0
     for i,(scene,dur) in enumerate(zip(scenes,durations),1):
         start=cursor; cursor+=dur
