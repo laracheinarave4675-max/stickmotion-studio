@@ -56,7 +56,7 @@ test("formats subtitle timestamps and builds sequential SRT cues", () => {
   assert.equal(buildSrt([
     { narration: "First beat.", duration: 4 },
     { narration: "Second beat.", duration: 3 }
-  ]), "1\\n00:00:00,000 --> 00:00:04,000\\nFirst beat.\\n\\n2\\n00:00:04,000 --> 00:00:07,000\\nSecond beat.\\n");
+  ]), "1\n00:00:00,000 --> 00:00:04,000\nFirst beat.\n\n2\n00:00:04,000 --> 00:00:07,000\nSecond beat.\n");
 });
 test("wraps captions and limits them to two readable lines", () => {
   const lines = wrapCaption("one two three four five six seven eight nine ten eleven twelve", 15, 2);
