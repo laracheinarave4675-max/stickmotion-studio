@@ -54,7 +54,7 @@ A second voice path is available for quality comparison. It uses the Gemini Deve
 1. Create a Gemini API key in [Google AI Studio](https://aistudio.google.com/).
 2. In the GitHub repository, open Settings → Secrets and variables → Actions → New repository secret.
 3. Name the secret `GEMINI_API_KEY` and paste the key as its value. Never put the key in a workflow input, source file, or chat.
-4. Open [Actions → Generate narration with Gemini TTS](https://github.com/laracheinarave4675-max/stickmotion-studio/actions/workflows/generate-gemini-voice.yml), choose Run workflow, paste up to 18,000 characters, choose a voice/model/style, and run.
+4. Open [Actions → Generate narration with Gemini TTS](https://github.com/laracheinarave4675-max/stickmotion-studio/actions/workflows/generate-gemini-voice.yml), choose Run workflow, paste up to 18,000 characters, choose a male voice/model/style, and run.
 5. Download the `stickmotion-gemini-voice` artifact when complete.
 
 The workflow defaults to `gemini-2.5-flash-preview-tts`; `gemini-3.1-flash-tts-preview` is also selectable. It joins 2,800-character narration chunks into one 24 kHz mono WAV. This is a long-form experiment, not yet a proven 15-minute production pipeline: actual account quota, model access, audio continuity and pronunciation must be tested. Gemini API free-tier availability and limits can change; Google Cloud Text-to-Speech has separate billing rules. The free Gemini API tier may use submitted data to improve Google products, so do not submit private or sensitive narration.
