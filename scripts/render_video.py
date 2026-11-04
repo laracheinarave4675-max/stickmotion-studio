@@ -423,7 +423,7 @@ def main():
             ffmpeg_bin=imageio_ffmpeg.get_ffmpeg_exe()
         except ImportError as exc:
             raise RuntimeError("FFmpeg is missing. Install imageio-ffmpeg or provide ffmpeg on PATH.") from exc
-    cmd=[ffmpeg_bin,"-y","-f","rawvideo","-pix_fmt","rgb24","-s",f"{SW}x{SH}","-r",str(FPS),"-i","-","-i",str(args.voice),"-i",str(args.music),"-i",str(args.sfx),"-filter_complex","[2:a]volume=0.24[bed];[bed][1:a]sidechaincompress=threshold=0.025:ratio=8:attack=20:release=550[ducked];[3:a]volume=0.55[sfx];[1:a][ducked][sfx]amix=inputs=3:duration=first:dropout_transition=2:normalize=0,alimiter=limit=0.95[aout]","-map","0:v:0","-s:v",f"{W}x{H}","-map","[aout]","-c:v","libx264","-preset","ultrafast","-crf","22","-pix_fmt","yuv420p","-c:a","aac","-b:a","192k","-shortest","-movflags","+faststart",str(args.output)]
+    cmd=[ffmpeg_bin,"-y","-f","rawvideo","-pix_fmt","rgb24","-s",f"{SW}x{SH}","-r",str(FPS),"-i","-","-i",str(args.voice),"-i",str(args.music),"-i",str(args.sfx),"-filter_complex","[1:a]loudnorm=I=-16:TP=-2:LRA=7[voice];[2:a]volume=0.38[bed];[bed][voice]sidechaincompress=threshold=0.045:ratio=5:attack=25:release=700[ducked];[3:a]volume=0.30[sfx];[voice][ducked][sfx]amix=inputs=3:duration=first:dropout_transition=2:normalize=0,alimiter=limit=0.95[aout]","-map","0:v:0","-s:v",f"{W}x{H}","-map","[aout]","-c:v","libx264","-preset","ultrafast","-crf","22","-pix_fmt","yuv420p","-c:a","aac","-b:a","192k","-shortest","-movflags","+faststart",str(args.output)]
     proc=subprocess.Popen(cmd,stdin=subprocess.PIPE); scene_index=0; boundaries=[]; c=0
     for dur in durations: c+=dur; boundaries.append(c)
     current_plate=None; current_plate_index=-1; previous_frame=None; transition_from=None
