@@ -349,58 +349,38 @@ def draw_scene(scene,index,t,duration,caption):
     return im
 
 def draw_scene_image(plate, scene, index, t, caption):
-    # The generated illustration is the scene itself; animate it with a restrained Ken Burns move.
+    # The generated illustration contains both people and environment.
+    # Never paste procedural rig bodies over AI artwork: that mismatch caused
+    # broken anatomy, doubled outlines and a visibly cutout character layer.
     im=ImageOps.fit(plate,(SW,SH),method=Image.Resampling.LANCZOS)
-    zoom=1.025+0.022*math.sin(t*.42)
-    if scene.get("mood")=="worried": zoom=1.045+0.025*math.sin(t*.55)
+    camera=str(scene.get("camera","medium shot")).lower()
+    if "wide" in camera or "establishing" in camera:
+        base_zoom=1.015; pan_x=math.sin(t*.16+index*.7)*10; pan_y=math.cos(t*.13+index)*4
+    elif "close" in camera or "tight" in camera or scene.get("mood")=="worried":
+        base_zoom=1.075; pan_x=math.sin(t*.20+index)*5; pan_y=math.cos(t*.18+index)*3
+    elif "over" in camera or "tracking" in camera or scene.get("mood")=="active":
+        base_zoom=1.055; pan_x=math.sin(t*.32+index)*13; pan_y=math.cos(t*.20+index)*6
+    else:
+        base_zoom=1.04; pan_x=math.sin(t*.22+index*.8)*8; pan_y=math.cos(t*.16+index)*4
+    zoom=base_zoom+0.012*math.sin(t*.42+index*.3)
     nw,nh=int(SW*zoom),int(SH*zoom)
     im=im.resize((nw,nh),Image.Resampling.LANCZOS)
-    ox=max(0,(nw-SW)//2+int(math.sin(t*.19+index)*8))
-    oy=max(0,(nh-SH)//2+int(math.cos(t*.17+index)*5))
+    ox=max(0,min(nw-SW,(nw-SW)//2+int(pan_x)))
+    oy=max(0,min(nh-SH,(nh-SH)//2+int(pan_y)))
     im=im.crop((ox,oy,ox+SW,oy+SH))
-    d=ImageDraw.Draw(im)
+    # Atmospheric accents move independently without deforming character anatomy.
     visual=scene.get("visual","")
-    action=scene.get("action","observing or explaining")
-    mood=scene.get("mood","explaining")
-    # Composite reusable animated character rigs over the AI-generated environment.
-    # Background plates contain no people, so the same character design remains consistent
-    # while limbs, expressions and mouth shapes animate independently on every frame.
-    shot=index%3
-    if mood=="worried" and shot==0:
-        shot=1
-    if shot==0:
-        cx,base,scale=SW*.51,470,.82
-    elif shot==1:
-        cx,base,scale=SW*.39,478,1.02
-    else:
-        cx,base,scale=SW*.50,515,1.30
-    # Keep the character layer registered to the drifting/zooming background plate.
-    # Tiny independent body motion prevents a pasted-on, motionless cutout effect.
-    camera_x=math.sin(t*.19+index)*8
-    camera_y=math.cos(t*.17+index)*5
-    layer_scale=scale*zoom
-    cx-=camera_x
-    base-=camera_y
-    interactive=(visual in ("conversation","investigation","crime","historical","war","classroom","home")
-                 or action in ("speaking or arguing","helping or rescuing","reaching or handing over"))
-    if shot==1 and interactive:
-        draw_character(d,min(850,cx+260*zoom),base,layer_scale*.76,t+1.1,"observing or explaining",
-                       "worried" if mood=="worried" else "thinking",3)
-    draw_character(d,cx,base,layer_scale,t,action,mood,0,close=(shot==2))
-    props=scene.get("props",[])
-    if props and shot!=2:
-        draw_prop(d,props[0],min(875,cx+115*layer_scale),base-145*layer_scale,(31,30,29))
-    if visual in ("war","disaster","shipwreck","wilderness","desert"):
-        for k in range(5):
-            x=(k*181+int(t*12))%SW
-            y=65+k*67
+    if visual in ("war","disaster","shipwreck","wilderness","desert","survival"):
+        overlay=Image.new("RGBA",(SW,SH),(0,0,0,0)); d=ImageDraw.Draw(overlay)
+        for k in range(7):
+            x=(k*149+int(t*15))%SW; y=55+k*61
             if visual in ("war","disaster"):
-                d.line((x,y,x+22,y-5),fill=(225,215,193),width=1)
+                d.line((x,y,x+25,y-5),fill=(235,224,198,90),width=2)
             else:
-                d.ellipse((x,y,x+2,y+2),fill=(224,216,197))
+                d.ellipse((x,y,x+2,y+2),fill=(235,224,198,100))
+        im=Image.alpha_composite(im.convert("RGBA"),overlay).convert("RGB")
     if caption:
-        lines=wrap(caption,width=78)[:2]
-        y=SH-48
+        d=ImageDraw.Draw(im); lines=wrap(caption,width=78)[:2]; y=SH-48
         rounded(d,(55,y-8,905,SH-12),8,(15,17,19),(15,17,19),1)
         for j,txt in enumerate(lines):
             d.text((SW//2,y+j*23),txt,font=font(17,True),fill=(250,248,239),anchor="ma")
@@ -433,7 +413,7 @@ def main():
     args.output.with_suffix(".srt").write_text("\n".join(srt),encoding="utf-8")
     scene_dir=args.output.parent/"scenes"
     ai_scene_count=sum(1 for i in range(len(scenes)) if (scene_dir/f"scene_{i+1:04d}.png").exists())
-    meta={"renderer":"AI-illustrated scene plates with 2D camera animation + Pillow/FFmpeg" if ai_scene_count else "layered procedural illustrated 2D cartoon + Pillow/FFmpeg","resolution":"1920x1080","fps":FPS,"audio_seconds":round(audio_duration,3),"scene_count":len(scenes),"voice":"mono narration WAV supplied","captions":"burned in; scene-weighted timing","music":"procedural cinematic underscore ducked under narration","sound_effects":"procedural event cues","ai_generated_scene_count":ai_scene_count,"visual_features":(["AI-generated bespoke environment plates","separately composited animated character rigs with individualized clothing and facial expressions","independent arm gestures, walking/running limbs, blinking and speaking mouth motion","wide/medium/close shot variation","subtle camera drift, zoom and scene dissolves"] if ai_scene_count else ["procedural period/location-specific illustrated environments","individualized clothed characters with facial expressions","independent arm gestures, walking/running limbs, blinking and speaking mouth motion","wide/medium/close shot variation","subtle camera drift and zoom"]),"limitations":(["AI environments are illustrated plates animated with camera motion; character rigs are procedural 2D overlays, not AI-generated frame-by-frame character animation","scene timing is estimated by narration word count"] if ai_scene_count else ["characters and sets are procedural vector-style illustrations, not hand-animated frame-by-frame","scene timing is estimated by narration word count"])}
+    meta={"renderer":"AI-illustrated scene plates with 2D camera animation + Pillow/FFmpeg" if ai_scene_count else "layered procedural illustrated 2D cartoon + Pillow/FFmpeg","resolution":"1920x1080","fps":FPS,"audio_seconds":round(audio_duration,3),"scene_count":len(scenes),"voice":"mono narration WAV supplied","captions":"burned in; scene-weighted timing","music":"procedural cinematic underscore ducked under narration","sound_effects":"procedural event cues","ai_generated_scene_count":ai_scene_count,"visual_features":(["AI-generated complete illustrated scenes with integrated characters and environments","consistent protagonist reference across scenes","directional wide/medium/close camera framing","subtle camera drift, zoom and atmospheric motion"] if ai_scene_count else ["procedural period/location-specific illustrated environments","individualized clothed characters with facial expressions","independent arm gestures, walking/running limbs, blinking and speaking mouth motion","wide/medium/close shot variation","subtle camera drift and zoom"]),"limitations":(["generated character poses are integrated into each illustrated scene; motion is camera and atmosphere animation, not full frame-by-frame character animation","scene timing is estimated by narration word count"] if ai_scene_count else ["characters and sets are procedural vector-style illustrations, not hand-animated frame-by-frame","scene timing is estimated by narration word count"])}
     args.output.with_suffix(".json").write_text(json.dumps(meta,indent=2),encoding="utf-8")
     ffmpeg_bin=shutil.which("ffmpeg")
     if not ffmpeg_bin:
