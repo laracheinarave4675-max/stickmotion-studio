@@ -170,8 +170,16 @@ def draw_character(d,cx,base,scale,t,action,mood,variant=0,close=False):
     # shoes
     ellipse(d,(cx+(-25+stride)*scale,base-8*scale,cx+(-7+stride)*scale,base+1*scale),ink,ink,1)
     ellipse(d,(cx+(8-stride)*scale,base-8*scale,cx+(27-stride)*scale,base+1*scale),ink,ink,1)
-    # jacket torso
-    rounded(d,(cx-23*scale,base-bodyh*.75*scale,cx+23*scale,base-bodyh*.18*scale),7*scale,coat,ink,max(2,int(4*scale)))
+    # jacket torso with tailored seams, lapels and pockets
+    torso_top=base-bodyh*.75*scale
+    torso_bottom=base-bodyh*.18*scale
+    breath=math.sin(t*2.4+variant)*1.8*scale
+    rounded(d,(cx-23*scale,torso_top+breath,cx+23*scale,torso_bottom+breath),7*scale,coat,ink,max(2,int(4*scale)))
+    # subtle fabric seams and a breast pocket make the outfit read as clothing
+    inkline(d,[P(-20,-bodyh*.69),P(-18,-bodyh*.29)],(142,137,124),max(1,int(1.3*scale)))
+    inkline(d,[P(20,-bodyh*.69),P(18,-bodyh*.29)],(142,137,124),max(1,int(1.3*scale)))
+    d.line((cx+8*scale,base-bodyh*.43*scale,cx+17*scale,base-bodyh*.43*scale),fill=(207,198,177),width=max(1,int(2*scale)))
+    d.line((cx+8*scale,base-bodyh*.43*scale,cx+8*scale,base-bodyh*.37*scale),fill=(207,198,177),width=max(1,int(1*scale)))
     # shirt and tie
     d.polygon([P(-8,-bodyh*.74),P(8,-bodyh*.74),P(4,-bodyh*.28),P(0,-bodyh*.22),P(-4,-bodyh*.28)],fill=(242,237,219),outline=ink)
     d.polygon([P(-2,-bodyh*.68),P(3,-bodyh*.68),P(5,-bodyh*.35),P(0,-bodyh*.29),P(-4,-bodyh*.35)],fill=(76,45,42),outline=ink)
@@ -195,7 +203,10 @@ def draw_character(d,cx,base,scale,t,action,mood,variant=0,close=False):
         inkline(d,[a,b],coat,max(5,int(12*scale)))
         inkline(d,[a,b],ink,max(2,int(3*scale)))
     for hand in (left2,right2):
+        # visible cuff, palm and tiny finger strokes instead of a featureless dot
         ellipse(d,(hand[0]-5*scale,hand[1]-5*scale,hand[0]+5*scale,hand[1]+5*scale),skin,ink,max(1,int(2*scale)))
+        for finger in (-2,1,4):
+            d.line((hand[0]+finger*scale,hand[1]+2*scale,hand[0]+(finger+1)*scale,hand[1]+6*scale),fill=(139,111,91),width=max(1,int(scale)))
     # head and hair
     hy=base-bodyh*.80*scale+bob*scale
     ellipse(d,(cx-headw*scale/2,hy-headh*scale/2,cx+headw*scale/2,hy+headh*scale/2),skin,ink,max(2,int(3*scale)))
@@ -214,6 +225,9 @@ def draw_character(d,cx,base,scale,t,action,mood,variant=0,close=False):
     else:
         d.pieslice((cx-headw*.6*scale,hy-headh*.6*scale,cx+headw*.6*scale,hy+headh*.6*scale),180,360,fill=(49,38,34),outline=ink,width=max(1,int(2*scale)))
     # brows, eyes, nose and expressive mouth
+    # ears and soft cheek accents help the face stay readable in medium shots
+    ellipse(d,(cx-headw*.53*scale,hy+2*scale,cx-headw*.40*scale,hy+17*scale),(229,190,165),ink,max(1,int(1.5*scale)))
+    ellipse(d,(cx+headw*.40*scale,hy+2*scale,cx+headw*.53*scale,hy+17*scale),(229,190,165),ink,max(1,int(1.5*scale)))
     eye_y=hy+2*scale; eye_dx=10*scale
     if mood=="worried":
         inkline(d,[(cx-eye_dx-4*scale,eye_y-9*scale),(cx-eye_dx+4*scale,eye_y-5*scale)],ink,max(1,int(2*scale)))
