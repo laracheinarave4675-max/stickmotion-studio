@@ -1,4 +1,5 @@
 const VISUAL_ORDER = [
+  ["railway", /\\b(railway|railroad|train|station|platform|locomotive|tracks|carriage)\\b/],
   ["classroom", /\b(classroom|schoolroom|school|teacher|students|lesson|pupils)\b/],
   ["village", /\b(village|streets?|market|square|houses)\b/],
   ["home", /\b(home|house|houses|bedroom|kitchen|piano|mother|family)\b/],
@@ -55,6 +56,7 @@ const ACTION_RULES = [
 ];
 
 const SETTING_LABELS = {
+  railway: "WWI-era railway station platform with a steam locomotive, iron tracks, wooden benches, luggage, coal smoke and exhausted soldiers; period-accurate architecture",
   classroom: "period classroom with desks and chalkboard", home: "warm family home interior", village: "historical village street", historical: "historical location or period setting", crime: "crime scene",
   investigation: "detective investigation room", prison: "prison cell or corridor",
   desert: "open desert landscape", shipwreck: "open sea and damaged vessel",
