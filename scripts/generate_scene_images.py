@@ -10,52 +10,52 @@ from PIL import Image
 
 MODEL = "@cf/black-forest-labs/flux-2-klein-4b"
 STYLE = (
-    "Premium stylized 3D animated documentary frame, cinematic miniature-world composition, "
-    "classic bare stick figures in a richly dimensional 3D world: a clean white circular head and ONLY thin black straight lines for torso, arms and legs, "
-    "one single straight line torso, two straight line arms and two straight line legs, tiny visible circular joints, simple dot eyes, "
-    "absolutely no clothing, no tunic, no robe, no jacket, no tie, no shirt, no pants, no shoes, no hands, no feet, no neck, "
-    "no shoulders, no chest, no hips, no body volume, no human silhouette; detailed environments, "
-    "physically based materials, realistic soft shadows, ambient occlusion, volumetric lighting, "
-    "strong foreground-midground-background separation, atmospheric perspective, shallow depth of field, "
-    "professional feature-animation quality, carefully composed 16:9 widescreen shot. "
-    "Characters must remain stickmen, never realistic human-bodied people. "
-    "No lettering, no subtitles, no logos, no watermark, no borders."
+    "Hand-drawn 2D storybook documentary cartoon, polished editorial illustration, "
+    "recognizable human cartoon characters with expressive white or light-toned faces, bold clean ink outlines, "
+    "readable eyes, eyebrows and mouth shapes, distinctive hairstyles and period-appropriate clothing silhouettes. "
+    "Characters have complete illustrated bodies, heads, necks, torsos, arms, hands, legs and shoes; "
+    "never stick figures, never black rods, never floating white spheres. "
+    "Rich fully illustrated story-specific environments with perspective architecture, furniture, props and layered depth. "
+    "Muted cinematic palette, warm interiors and daylight contrasted with cold dramatic night scenes, intentional shadows, "
+    "subtle painterly texture, expressive acting, professional historical animated documentary art direction. "
+    "Wide 16:9 composition, no lettering, no subtitles, no logos, no watermark."
 )
-NEGATIVE = "text, typography, subtitles, captions, logo, watermark, photorealistic humans, realistic human body, muscular anatomy, flat vector art, crude anatomy, detached limbs, extra limbs, gore, extreme close-up, giant head, oversized face, floating head, cropped body, duplicate protagonist, collage, split screen"
+NEGATIVE = "stick figure, stickman, black rod body, line-art person, white ball head, sphere head, faceless mannequin, primitive geometric human, photorealistic human, text, typography, subtitles, logo, watermark, gore, extra limbs, malformed hands, duplicate protagonist, collage, split screen"
 def load_scenes(text: str):
     js = "import {buildScenePlan} from './src/scene-planner.js'; console.log(JSON.stringify(buildScenePlan(" + json.dumps(text) + ")));"
     return json.loads(subprocess.run(["node", "--input-type=module", "-e", js], check=True, capture_output=True, text=True).stdout)
 def make_prompt(scene: dict, index: int, total: int, protagonist: str) -> str:
-    props = ", ".join(scene.get("props", [])[:4]) or "period-appropriate objects integrated naturally into the setting"
+    props = ", ".join(scene.get("props", [])[:5]) or "objects naturally used by the characters in this location"
     narration = " ".join(scene.get("narration", "").split())
     camera = scene.get("camera", "cinematic medium shot")
+    action = scene.get("action", "show the character physically doing the action described")
+    mood = scene.get("mood", "emotion clearly visible in face and posture")
+    setting = scene.get("setting", "a specific, fully dressed story location")
     return (
         f"{STYLE}\\n"
-        "Create one complete, cohesive stylized 3D animated frame with stickman characters INCLUDED. "
-        "Every character must be an unmistakable bare stick figure: one white circular head, one single straight black line torso, "
-        "two thin black line arms and two thin black line legs, tiny joint dots, and nothing else. "
-        "NO clothing or accessories of any kind: NO hat, NO tie, NO coat, NO tunic, NO robe, NO shirt, NO trousers, NO shoes, NO bag. "
-        "NO neck, NO shoulders, NO chest, NO waist, NO hips, NO body mass, NO realistic hands or feet. "
-        "Preserve this exact stick-figure silhouette at every camera angle. Add depth through lighting, shadows and 3D environment, "
-        "not by turning the characters into realistic humanoids. The protagonist retains the same round head, face marks and accessory. "
-        "No detached limbs, duplicate heads or extra arms.\\n"
-        f"Scene {index + 1} of {total}. Setting: {scene.get('setting','specific story location')}. "
-        f"Visual category: {scene.get('visual','historical')}. Action to visibly depict: {scene.get('action','observing or explaining')}. "
-        f"Emotion and facial acting: {scene.get('mood','explaining')}. Important props: {props}. "
-        f"Directed camera composition: {camera}.\\n"
-        f"Tell this exact narration beat in a single readable visual moment: {narration}\\n"
-        "Art direction: premium cinematic 3D animated documentary environment with tiny minimalist 2D line-art stick figures, "
-        "the characters remain flat black rods and white circles while the world around them is fully dimensional, "
-        "soft contact shadows, ambient occlusion, cinematic rim lighting and realistic bounce light, "
-        "detailed layered environments with strong vanishing points and foreground objects, rich material texture, "
-        "controlled cinematic color grade, volumetric haze and selective depth of field. Avoid flat vector art, "
-        "flat 2D illustration, front-facing diagram layouts, and orthographic compositions. "
-        "Vary camera direction between scenes: low-angle perspective, high-angle looking down, three-quarter view, "
-        "over-the-shoulder, deep wide establishing shot, diagonal tracking composition, and close-up only when "
-        "the narration calls for it. Use visible parallax cues, foreground framing and strong perspective depth. "
-        "Use the reference image to preserve protagonist identity and the exact stickman design, but invent "
-        "a new location, action, staging and camera angle for this scene."
-    )[:2048]
+        f"Create a single coherent illustrated frame for scene {index + 1} of {total}. "
+        "Show actual illustrated people, not symbols or stick figures. "
+        "Character design: rounded expressive faces, visible eyes and eyebrows, clear mouth expression, "
+        "distinct hair or period headwear, complete clothed bodies with believable cartoon proportions, "
+        "bold dark ink contour lines and carefully drawn hands and shoes. "
+        "Maintain the same lead character identity, face, hairstyle and outfit across all scenes. "
+        f"Lead character continuity note: {protagonist}. "
+        f"Location and environment: {setting}. "
+        f"Visible physical action (must be unmistakable at a glance): {action}. "
+        f"Emotion and body language: {mood}. Essential story props being handled or interacted with: {props}. "
+        f"Camera direction: {camera}. "
+        f"Narration beat to dramatize: {narration}. "
+        "Compose a specific narrative moment, not a generic group portrait. "
+        "The people must interact with the environment and props: hands grasp, point, open, carry, write, reach, "
+        "or support objects as the action requires. Show contextual details that prove the location and era. "
+        "Use varied wide establishing, medium action, over-shoulder and emotional close shots as appropriate. "
+        "Hand-drawn 2D animation film aesthetic, sophisticated storyboarding, expressive character acting, "
+        "layered painted background, consistent ink weight, restrained cinematic color grading, strong readable silhouettes. "
+        "Do not use 3D plastic toy aesthetics, bare stick figures, black line bodies, spherical blank heads, "
+        "generic empty backgrounds, random props, or repeated static poses. "
+        "If a style reference image is provided, match its illustration language and character design faithfully."
+    )[:3000]
+
 def multipart(fields: dict[str, str], files: dict[str, tuple[str, bytes, str]]) -> tuple[bytes, str]:
     boundary = "----StickMotion" + uuid.uuid4().hex
     chunks = []
