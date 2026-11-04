@@ -262,14 +262,14 @@ def draw_scene(scene,index,t,duration,caption):
     sky,mid,ground,ink=PALETTES.get(visual,PALETTES["room"])
     im=Image.new("RGB",(SW,SH),sky); d=ImageDraw.Draw(im)
     draw_background(d,visual,t)
-    shot=(index+1)%4
-    if mood=="worried": shot=2
+    shot=index%4
+    if mood=="worried" and shot==0: shot=1
     if shot==0: # establishing: people small, place dominates
         scale=.86; cx=SW*.50; base=450
     elif shot==1: # medium two-shot / character and prop
         scale=1.18; cx=SW*.43; base=455
-    elif shot==2: # emotional close-up
-        scale=4.0; cx=SW*.50; base=1300
+    elif shot==3: # controlled emotional close-up with full facial features in frame
+        scale=1.45; cx=SW*.50; base=640
     else: # off-centre cinematic composition
         scale=1.28; cx=SW*.34; base=460
     # subtle distant crowd in historical/war/city scenes
@@ -282,16 +282,16 @@ def draw_scene(scene,index,t,duration,caption):
         partner_x=min(850,cx+245)
         draw_character(d,partner_x,base,scale*.78,t+1.1,"observing or explaining","worried" if mood=="worried" else "thinking",index+3)
     # main character
-    draw_character(d,cx,base,scale,t,action,mood,index,close=(shot==2))
+    draw_character(d,cx,base,scale,t,action,mood,index,close=(shot==3))
     props=scene.get("props",[])
-    if props and shot!=2:
+    if props and shot!=3:
         px=min(850,cx+105*scale); py=base-150*scale
         draw_prop(d,props[0],px,py,ink)
     # scene-specific furniture / table foreground
-    if visual in ("investigation","crime") and shot!=2:
+    if visual in ("investigation","crime") and shot!=3:
         rounded(d,(cx-125,base-105,cx+165,base-72),5,(104,76,55),ink,2)
         for j in range(3): draw_prop(d,"document",cx-75+j*75,base-119,ink)
-    elif visual=="room" and shot!=2:
+    elif visual=="room" and shot!=3:
         d.rectangle((cx+90,base-145,cx+240,base-90),fill=(120,82,52),outline=ink,width=3)
         d.line((cx+100,base-90,cx+100,base-10),fill=ink,width=4)
         d.line((cx+230,base-90,cx+230,base-10),fill=ink,width=4)
@@ -305,7 +305,7 @@ def draw_scene(scene,index,t,duration,caption):
         d.text((28,20),f"SCENE {index+1:02d}",font=font(13,True),fill=(242,235,218))
     # camera drift/zoom, then upscale to delivery resolution
     zoom=1.025+0.018*math.sin(t*.55)
-    if shot==2: zoom=1.08+0.025*math.sin(t*.7)
+    if shot==3: zoom=1.035+0.012*math.sin(t*.7)
     nw,nh=int(SW*zoom),int(SH*zoom)
     im=im.resize((nw,nh),Image.Resampling.LANCZOS)
     ox=max(0,(nw-SW)//2+int(math.sin(t*.24)*5)); oy=max(0,(nh-SH)//2+int(math.cos(t*.21)*3))
