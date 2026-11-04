@@ -45,6 +45,16 @@ jobs:
           with wave.open("output/narration.wav","wb") as f:
               f.setnchannels(1); f.setsampwidth(2); f.setframerate(rate); f.writeframes(data.tobytes())
           PY
+      - name: Generate AI scene artwork when Cloudflare free-tier credentials are configured
+        env:
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+        run: |
+          if [ -n "$CLOUDFLARE_ACCOUNT_ID" ] && [ -n "$CLOUDFLARE_API_TOKEN" ]; then
+            python scripts/generate_scene_images.py --narration output/narration.txt --output-dir output/scenes --max-images 10
+          else
+            echo "Cloudflare image secrets not configured; renderer will use its local illustrated fallback."
+          fi
       - name: Render illustrated MP4
         run: python scripts/render_video.py --narration output/narration.txt --voice output/narration.wav --output output/illustrated-visual-proof.mp4
       - name: Upload visual proof
@@ -57,4 +67,5 @@ jobs:
             output/illustrated-visual-proof.json
             output/narration.wav
             output/narration.txt
+            output/scenes/*.png
           retention-days: 3
