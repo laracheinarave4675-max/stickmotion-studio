@@ -2,6 +2,7 @@ import importlib.util
 import tempfile
 import unittest
 import wave
+from PIL import ImageChops
 from pathlib import Path
 
 ROOT = Path(__file__).parents[1]
@@ -26,6 +27,19 @@ class RendererTests(unittest.TestCase):
         frame = MODULE.draw_scene(scene, 0, 0.5, 5.0, scene["narration"])
         self.assertEqual(frame.size, (1920, 1080))
         self.assertEqual(frame.mode, "RGB")
+
+    def test_illustrated_scene_uses_distinct_camera_framing(self):
+        scene = MODULE.load_scenes("The detective examined the evidence folder in the investigation room.")[0]
+        wide = MODULE.draw_scene(scene, 0, 0.5, 5.0, "")
+        close = MODULE.draw_scene(scene, 2, 0.5, 5.0, "")
+        self.assertEqual(wide.size, (1920, 1080))
+        self.assertIsNotNone(ImageChops.difference(wide, close).getbbox())
+
+    def test_renderer_exposes_reference_style_features(self):
+        scene = MODULE.load_scenes("The soldiers marched through the old city during the war.")[0]
+        frame = MODULE.draw_scene(scene, 1, 1.0, 5.0, scene["narration"])
+        self.assertEqual(frame.mode, "RGB")
+        self.assertGreater(len(set(frame.resize((96, 54)).getdata())), 30)
 
     def test_long_caption_is_paginated_not_discarded(self):
         text = " ".join(["A very important detail appears in the scene."] * 12)
