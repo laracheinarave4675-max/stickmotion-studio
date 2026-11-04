@@ -177,3 +177,15 @@ Never confuse a successful static-site deployment with a finished video generato
 - Added `docs/REFERENCE_ANIMATION_DIRECTION.md` on branch `reference-style-animation` with the approved art direction, pipeline principles, quality gates, and hybrid illustrated-scene strategy.
 - Next engineering step: inspect the existing renderer and replace the generic composition in bounded stages—first a character/environment asset-composition layer and shot-framing controls, then a short pilot to inspect. If primitive drawing cannot meet the style, change scene construction instead of adding cosmetic effects.
 - Quality gate: user must review the actual rendered video and approve the visual result before scaling to long runtime. No claim of target-level quality is made yet.
+
+
+## 2026-11-04 — first illustrated-scene renderer implementation
+- Replaced the single primitive stick-person frame with a lightweight illustrated 2D scene renderer in `scripts/render_video.py`.
+- New renderer composes location-specific streets/interiors, period-like building facades, room architecture, furniture, landscape layers, varied clothed character silhouettes, hair/headwear variants, facial expressions, hand gestures, scene props, crowd/supporting characters, wide/medium/close framing, subtle camera drift/zoom, and a restrained vignette.
+- Kept the existing bounded MP4, voice, SRT, music and SFX pipeline and the 90-second cap. This is a procedural illustrated renderer, not yet frame-by-frame character animation or AI-generated artwork; it is an intermediate engineering step toward the approved references.
+- Fixed subtitle compositing so captions are drawn onto the final processed frame.
+- Expanded `tests/test_render_video.py` to check distinct camera framing and minimum visual complexity.
+- Added `.github/workflows/reference-renderer-tests.yml` to run JavaScript and Python checks on this branch and pull requests.
+- Commits on `reference-style-animation`: renderer replacement `9de555c`, subtitle overlay fix `ca73c1e`, supporting cast/vignette `beffb68`, visual tests `ad1db91`, renderer CI `2ffc001`.
+- Validation is pending GitHub Actions. Do not treat the renderer as validated until CI passes and a new MP4 is rendered and visually reviewed.
+- Next: resolve any CI failures, then render a fresh short pilot using the same Charon/MP4 workflow and inspect actual output. If procedural art still falls short, move to reusable authored/generated illustrated assets and rigged animation rather than polishing generic vector figures.
