@@ -12,6 +12,20 @@ A mobile-first animated storytelling studio for history, survival, true crime, i
 - Estimated storyboard runtime, export progress and cancellation.
 - Dependency-free Node.js unit tests.
 
+## Approved character reference
+If the user supplies the approved Memorial de Verdun character image, place it at
+`assets/references/memorial-verdun.png` (or `.jpg`). The cloud pilot converts it to a
+character-only reference and uses it to preserve the lead character's design. It must
+not copy the reference image's scene composition or background. Without that file,
+the generator derives a temporary character reference from the first generated scene.
+
+## Image-first storytelling
+The target is a sequence of distinct, story-specific illustrations—not character
+animation. Each narration beat gets its own composed image; editing uses controlled
+cuts, dissolves and camera reframing only. Repeated group portraits and repeated
+background layouts are rejected as quality failures. Narration, a changing music bed
+and story-matched sound cues are mixed into the MP4.
+
 ## Visual direction
 The approved target is a cinematic illustrated story-cartoon: expressive, varied characters with clear faces and clothing; richly dressed, story-specific streets and interiors; props that matter to the narration; wide, medium and emotional close-up shots; muted painted color, ink outlines, lighting and camera movement. Do not settle for bare stick figures, empty backgrounds or unrelated stock footage.
 
