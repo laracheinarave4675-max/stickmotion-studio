@@ -3,7 +3,7 @@
 from __future__ import annotations
 import argparse, json, math, subprocess, sys, wave, random, shutil
 from pathlib import Path
-from PIL import Image, ImageDraw, ImageFont, ImageFilter
+from PIL import Image, ImageDraw, ImageFont, ImageFilter, ImageOps
 from textwrap import wrap
 
 W, H, FPS = 1920, 1080, 30
@@ -325,6 +325,35 @@ def draw_scene(scene,index,t,duration,caption):
         for j,txt in enumerate(lines):
             d.text((SW//2,y+j*23),txt,font=font(17,True),fill=(250,248,239),anchor="ma")
     return im
+
+def draw_scene_image(plate, scene, index, t, caption):
+    # The generated illustration is the scene itself; animate it with a restrained Ken Burns move.
+    im=ImageOps.fit(plate,(SW,SH),method=Image.Resampling.LANCZOS)
+    zoom=1.025+0.022*math.sin(t*.42)
+    if scene.get("mood")=="worried": zoom=1.045+0.025*math.sin(t*.55)
+    nw,nh=int(SW*zoom),int(SH*zoom)
+    im=im.resize((nw,nh),Image.Resampling.LANCZOS)
+    ox=max(0,(nw-SW)//2+int(math.sin(t*.19+index)*8))
+    oy=max(0,(nh-SH)//2+int(math.cos(t*.17+index)*5))
+    im=im.crop((ox,oy,ox+SW,oy+SH))
+    d=ImageDraw.Draw(im)
+    visual=scene.get("visual","")
+    if visual in ("war","disaster","shipwreck","wilderness","desert"):
+        for k in range(5):
+            x=(k*181+int(t*12))%SW
+            y=65+k*67
+            if visual in ("war","disaster"):
+                d.line((x,y,x+22,y-5),fill=(225,215,193),width=1)
+            else:
+                d.ellipse((x,y,x+2,y+2),fill=(224,216,197))
+    if caption:
+        lines=wrap(caption,width=78)[:2]
+        y=SH-48
+        rounded(d,(55,y-8,905,SH-12),8,(15,17,19),(15,17,19),1)
+        for j,txt in enumerate(lines):
+            d.text((SW//2,y+j*23),txt,font=font(17,True),fill=(250,248,239),anchor="ma")
+    return im
+
 def main():
     ap=argparse.ArgumentParser()
     ap.add_argument("--narration",required=True,type=Path); ap.add_argument("--voice",required=True,type=Path)
@@ -350,7 +379,9 @@ def main():
     for i,(scene,dur) in enumerate(zip(scenes,durations),1):
         start=cursor; cursor+=dur; srt.append(f"{i}\n{stamp(start)} --> {stamp(cursor)}\n{scene['narration']}\n")
     args.output.with_suffix(".srt").write_text("\n".join(srt),encoding="utf-8")
-    meta={"renderer":"layered illustrated 2D cartoon + Pillow/FFmpeg","resolution":"1920x1080","fps":FPS,"audio_seconds":round(audio_duration,3),"scene_count":len(scenes),"voice":"mono narration WAV supplied","captions":"burned in; scene-weighted timing","music":"procedural cinematic underscore ducked under narration","sound_effects":"procedural event cues","visual_features":["period/location-specific illustrated environments including streets, classrooms and homes","individualized clothed characters with facial expressions","crowd layers","wide/medium/close shot variation","subtle camera drift and zoom"],"limitations":["characters and sets are procedural vector-style illustrations, not hand-animated frame-by-frame","scene timing is estimated by narration word count"]}
+    scene_dir=args.output.parent/"scenes"
+    ai_scene_count=sum(1 for i in range(len(scenes)) if (scene_dir/f"scene_{i+1:04d}.png").exists())
+    meta={"renderer":"AI-illustrated scene plates with 2D camera animation + Pillow/FFmpeg" if ai_scene_count else "layered procedural illustrated 2D cartoon + Pillow/FFmpeg","resolution":"1920x1080","fps":FPS,"audio_seconds":round(audio_duration,3),"scene_count":len(scenes),"voice":"mono narration WAV supplied","captions":"burned in; scene-weighted timing","music":"procedural cinematic underscore ducked under narration","sound_effects":"procedural event cues","ai_generated_scene_count":ai_scene_count,"visual_features":["AI-generated bespoke scene artwork when Cloudflare Workers AI credentials are configured","period/location-specific illustrated environments including streets, classrooms and homes","individualized clothed characters with facial expressions","crowd layers","wide/medium/close shot variation","subtle camera drift and zoom"],"limitations":["characters and sets are procedural vector-style illustrations, not hand-animated frame-by-frame","scene timing is estimated by narration word count"]}
     args.output.with_suffix(".json").write_text(json.dumps(meta,indent=2),encoding="utf-8")
     ffmpeg_bin=shutil.which("ffmpeg")
     if not ffmpeg_bin:
@@ -362,13 +393,28 @@ def main():
     cmd=[ffmpeg_bin,"-y","-f","rawvideo","-pix_fmt","rgb24","-s",f"{SW}x{SH}","-r",str(FPS),"-i","-","-i",str(args.voice),"-i",str(args.music),"-i",str(args.sfx),"-filter_complex","[2:a]volume=0.24[bed];[bed][1:a]sidechaincompress=threshold=0.025:ratio=8:attack=20:release=550[ducked];[3:a]volume=0.55[sfx];[1:a][ducked][sfx]amix=inputs=3:duration=first:dropout_transition=2:normalize=0,alimiter=limit=0.95[aout]","-map","0:v:0","-s:v",f"{W}x{H}","-map","[aout]","-c:v","libx264","-preset","ultrafast","-crf","22","-pix_fmt","yuv420p","-c:a","aac","-b:a","192k","-shortest","-movflags","+faststart",str(args.output)]
     proc=subprocess.Popen(cmd,stdin=subprocess.PIPE); scene_index=0; boundaries=[]; c=0
     for dur in durations: c+=dur; boundaries.append(c)
+    current_plate=None; current_plate_index=-1; previous_frame=None; transition_from=None
     try:
         for frame in range(total_frames):
             while scene_index<len(durations)-1 and frame/FPS>=boundaries[scene_index]: scene_index+=1
+            if scene_index!=current_plate_index:
+                if previous_frame is not None: transition_from=previous_frame.copy()
+                current_plate_index=scene_index
+                plate_path=scene_dir/f"scene_{scene_index+1:04d}.png"
+                current_plate=Image.open(plate_path).convert("RGB") if plate_path.exists() else None
             local_t=max(0,frame/FPS-(boundaries[scene_index-1] if scene_index else 0))
             scene=scenes[scene_index]
-            frame_image=draw_scene(scene,scene_index,local_t,durations[scene_index],scene["narration"])
+            if current_plate is not None:
+                frame_image=draw_scene_image(current_plate,scene,scene_index,local_t,scene["narration"])
+            else:
+                frame_image=draw_scene(scene,scene_index,local_t,durations[scene_index],scene["narration"])
+            if transition_from is not None:
+                if local_t<0.35:
+                    frame_image=Image.blend(transition_from,frame_image,min(1.0,local_t/0.35))
+                else:
+                    transition_from=None
             proc.stdin.write(frame_image.tobytes())
+            previous_frame=frame_image
             if frame%150==0: print(f"Rendered {frame}/{total_frames} frames",flush=True)
         proc.stdin.close(); code=proc.wait()
         if code: raise RuntimeError(f"FFmpeg exited with code {code}")
