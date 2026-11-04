@@ -19,21 +19,40 @@ def generate(path, seconds, visual):
     mode="suspense" if visual in ("crime","investigation","prison","night","clock","shipwreck") else ("epic" if visual in ("war","disaster") else "minor")
     intervals=SCALE[mode]
     rng=random.Random(37)
-    phases=[rng.random()*math.tau for _ in range(5)]
+    phases=[rng.random()*math.tau for _ in range(9)]
+    progressions={
+        "minor":[0,5,3,7],
+        "suspense":[0,-1,3,7],
+        "epic":[0,5,7,3],
+        "major":[0,5,3,4],
+        "hope":[0,5,3,7]
+    }
+    progression=progressions.get(mode,[0,5,3,7])
     samples=array("h")
     chord_seconds=8.0
     for i in range(count):
         t=i/RATE
         chord=int(t/chord_seconds)%4
-        semis=(0, (3 if mode=="minor" else 5), 7, (10 if mode!="major" else 11))
-        # slow chord changes, warm pad and a soft repeating low pulse
+        transpose=progression[chord]
+        chord_root=root*(2**(transpose/12))
+        semis=(0, intervals[1], intervals[2], intervals[3])
+        # Layered string-like pad, low cinematic drone, and a restrained repeating ostinato.
         value=0.0
         for j,step in enumerate(semis):
-            freq=root*(2**(step/12))
-            value += (0.105/(j+1))*math.sin(math.tau*freq*t+phases[j]+0.10*math.sin(t*.17))
-        value += .035*math.sin(math.tau*(root/2)*t+phases[4])
+            freq=chord_root*(2**(step/12))
+            lfo=0.88+0.12*math.sin(math.tau*(0.035+j*0.009)*t+phases[j])
+            voice=math.sin(math.tau*freq*t+phases[j]+0.10*math.sin(t*.17))
+            detuned=math.sin(math.tau*(freq*1.003)*t+phases[j+4])
+            value += (0.075/(1+j*.25))*lfo*(0.72*voice+0.28*detuned)
+        value += .045*math.sin(math.tau*(chord_root/2)*t+phases[8])
+        # Soft repeating arpeggio gives the bed a pulse without competing with speech.
+        beat=t%1.5
+        arp_step=(0,2,1,3)[int((t%3.0)/.75)]
+        arp_freq=chord_root*(2**(semis[arp_step]/12))*2
+        arp_env=math.exp(-beat*3.8)
+        value += .026*arp_env*math.sin(math.tau*arp_freq*t)
         pulse=(.5+.5*math.sin(math.tau*.25*t))**5
-        value += .018*pulse*math.sin(math.tau*root*t)
+        value += .022*pulse*math.sin(math.tau*chord_root*t)
         # gentle fade at both ends; no abrupt clicks
         fade=min(1.0,t/2.5,(seconds-t)/3.0)
         value*=max(0.0,fade)
