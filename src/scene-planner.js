@@ -10,7 +10,7 @@ const VISUAL_ORDER = [
   ["desert", /\b(desert|sandstorm|dune|sahara|oasis|scorching|heatwave|camel|arid)\b/],
   ["shipwreck", /\b(shipwreck|ship|sinking|ocean|sea|island|raft|sailor|titanic|drown|storm at sea|castaway)\b/],
   ["wilderness", /\b(forest|jungle|wild|bear|wolf|snake|predator|mountain|cave|river|campfire|hunting|tracking)\b/],
-  ["war", /\b(war|battle|soldiers?|army|weapon|siege|frontline|invasion|bomb|trench|general|combat|military|march)\b/],
+  ["war", /\b(war|world war|wwi|wwii|verdun|battle|soldiers?|army|weapon|siege|frontline|invasion|bomb|trench|general|combat|military|march|artillery)\b/],
   ["disaster", /\b(disaster|earthquake|flood|fire|wildfire|hurricane|tsunami|volcano|collapse|explosion|crash|catastrophe)\b/],
   ["survival", /\b(surviv|stranded|alone|starv|thirst|shelter|ration|rescue|lost|wilderness|escape|trapped|endure)\b/],
   ["night", /\b(dark|darkness|night|shadow|afraid|fear|scared|haunted|lights? (?:go|went) out)\b/],
@@ -37,6 +37,9 @@ const PROP_RULES = [
 ];
 
 const ACTION_RULES = [
+  ["entering or arriving", /\b(enter|entered|entering|arrive|arrived|arriving)\b/],
+  ["carrying an important object", /\b(carry|carried|carrying|holding|held|clutching)\b/],
+  ["reading or writing a document", /\b(read|reading|wrote|writing|write|letter|document|note)\b/],
   ["opening or unlocking", /\b(open|opened|opening|unlock|unlocked|unlocked|turn the key)\b/],
   ["picking up or collecting", /\b(pick up|picked up|grab|grabbed|collect|collected|lift|lifted)\b/],
   ["helping or rescuing", /\b(help|helped|rescue|rescued|pull|pulled|carry|carried|drag|dragged)\b/],
@@ -49,6 +52,7 @@ const ACTION_RULES = [
   ["climbing", /\b(climb|climbing|scramble|ascend)\b/],
   ["swimming or struggling in water", /\b(swim|swimming|drown|drowning|drift|floating|waves)\b/],
   ["building a shelter", /\b(shelter|build|building|construct|camp)\b/],
+  ["departing or evacuating", /\b(depart|departure|departing|evacuate|evacuation|leave|leaving)\b/],
   ["sitting or waiting", /\b(sit|sitting|wait|waiting|rest|resting)\b/],
   ["speaking or arguing", /\b(said|say|asked|replied|shout|shouted|whisper|argue|discuss|talk)\b/],
   ["discovering or revealing", /\b(found|discover|revealed|uncovered|realized|noticed)\b/],
@@ -78,7 +82,7 @@ export function classifyScene(text) {
   const value = String(text ?? "").toLowerCase();
   const visual = firstMatch(value, VISUAL_ORDER, "room");
   let mood = "explaining";
-  if (/\b(fear|afraid|danger|threat|worry|worried|anxious|scared|haunted|terrified|panic|desperate)\b/.test(value)) mood = "worried";
+  if (/\b(fear|afraid|danger|threat|worry|worried|anxious|scared|haunted|terrified|panic|desperate|exhausted|silence)\b/.test(value)) mood = "worried";
   else if (/\b(happy|joy|success|love|wonderful|amazing|hope|celebrate|victory|relief)\b/.test(value)) mood = "happy";
   else if (/\b(run|running|move|moving|quick|sudden|jump|journey|travel|climb|escape|fight|attack|struggle)\b/.test(value)) mood = "active";
   else if (/\b(why|how|wonder|question|think|imagine|perhaps|maybe|curious|investigate|discover|realized)\b/.test(value)) mood = "thinking";
