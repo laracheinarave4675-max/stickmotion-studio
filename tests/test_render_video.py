@@ -49,6 +49,15 @@ class RendererTests(unittest.TestCase):
         later = MODULE.draw_scene(scene, 1, 0.8, 5.0, "")
         self.assertIsNotNone(ImageChops.difference(first, later).getbbox())
 
+    def test_ai_background_plates_receive_independently_animated_characters(self):
+        scene = MODULE.load_scenes("The officer explained the plan to the frightened soldier.")[0]
+        scene["action"] = "speaking or arguing"
+        plate = MODULE.Image.new("RGB", (1024, 576), (110, 130, 145))
+        first = MODULE.draw_scene_image(plate, scene, 1, 0.1, "")
+        later = MODULE.draw_scene_image(plate, scene, 1, 0.8, "")
+        self.assertEqual(first.size, (960, 540))
+        self.assertIsNotNone(ImageChops.difference(first, later).getbbox())
+
     def test_renderer_exposes_reference_style_features(self):
         scene = MODULE.load_scenes("The soldiers marched through the old city during the war.")[0]
         frame = MODULE.draw_scene(scene, 1, 1.0, 5.0, scene["narration"])
