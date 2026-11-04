@@ -290,6 +290,7 @@ def draw_scene(scene,index,t,duration,caption):
     shade=shade.filter(ImageFilter.GaussianBlur(45))
     dark=Image.new("RGB",(SW,SH),(12,14,17))
     im=Image.composite(im,dark,shade)
+    d=ImageDraw.Draw(im)
     # subtitle panel with readable two-line safe margins
     if caption:
         lines=wrap(caption,width=78)[:2]
