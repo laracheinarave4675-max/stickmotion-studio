@@ -233,3 +233,9 @@ Never confuse a successful static-site deployment with a finished video generato
 - Kept the internal illustration canvas at 960×540 and moved the final upscale to 1920×1080 into FFmpeg. This preserves the 1080p delivery dimensions while reducing raw frame-pipe traffic by 75% and avoiding a redundant full-size Pillow resize per frame.
 - Updated renderer tests to assert the internal drawing surface dimensions; MP4 output metadata remains 1920×1080 at 30 fps.
 - New proof run will validate this faster path together with the latest classroom/home/village and enlarged close-up changes.
+
+
+## 2026-11-04 — close-up coordinate bug fixed
+- Inspection of the second proof showed that the enlarged close-up rig placed its head outside the frame because the body-height offsets were not multiplied by camera scale.
+- Corrected the scaled torso, head-centre and button coordinates; added a regression test that checks the close-up frame contains visible facial detail.
+- This was a renderer geometry bug, not an art-direction issue. A new proof is required after the fix.
