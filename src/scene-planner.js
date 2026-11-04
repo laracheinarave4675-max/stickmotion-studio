@@ -1,7 +1,7 @@
 const VISUAL_ORDER = [
   ["classroom", /\b(classroom|schoolroom|school|teacher|students|lesson|pupils)\b/],
+  ["village", /\b(village|streets?|market|square|houses)\b/],
   ["home", /\b(home|house|houses|bedroom|kitchen|piano|mother|family)\b/],
-  ["village", /\b(village|town|street|market|square|houses)\b/],
   ["historical", /\b(history|historical|ancient|medieval|kingdom|empire|pharaoh|roman|egyptian|viking|castle|knight|dynasty|century|archaeolog|artifact|civilization|revolution)\b/],
   ["crime", /\b(murder|killer|crime|criminal|victim|suspect|homicide|serial|poison|blood|body|dead|death|assassin|robbery|theft|kidnap|missing person)\b/],
   ["investigation", /\b(detective|investigat|evidence|clue|fingerprint|interrogate|witness|case file|forensic|police|crime scene|mystery|questioned)\b/],
