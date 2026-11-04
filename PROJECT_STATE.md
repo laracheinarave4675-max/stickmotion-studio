@@ -227,3 +227,9 @@ Never confuse a successful static-site deployment with a finished video generato
 - Increased close-up shot scale and switched the character rig to its enlarged head/face proportions for close-up beats; village establishing shots also include a background crowd.
 - This follows inspection of the first proof, where the supposed close-up was still too distant.
 - New proof run is required to validate these latest framing changes.
+
+
+## 2026-11-04 — render throughput optimization
+- Kept the internal illustration canvas at 960×540 and moved the final upscale to 1920×1080 into FFmpeg. This preserves the 1080p delivery dimensions while reducing raw frame-pipe traffic by 75% and avoiding a redundant full-size Pillow resize per frame.
+- Updated renderer tests to assert the internal drawing surface dimensions; MP4 output metadata remains 1920×1080 at 30 fps.
+- New proof run will validate this faster path together with the latest classroom/home/village and enlarged close-up changes.
