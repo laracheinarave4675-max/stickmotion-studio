@@ -239,3 +239,12 @@ Never confuse a successful static-site deployment with a finished video generato
 - Inspection of the second proof showed that the enlarged close-up rig placed its head outside the frame because the body-height offsets were not multiplied by camera scale.
 - Corrected the scaled torso, head-centre and button coordinates; added a regression test that checks the close-up frame contains visible facial detail.
 - This was a renderer geometry bug, not an art-direction issue. A new proof is required after the fix.
+
+
+## 2026-11-04 — AI-generated scene artwork pipeline added
+- Added `scripts/generate_scene_images.py` using Cloudflare Workers AI FLUX.2 Klein 4B. It converts each planned narration beat into a bespoke 1024×576 illustrated scene plate, uses the first generated frame as a small visual reference for later scenes, supports resumable existing files, bounded image counts and retries.
+- Added an AI-scene rendering path in `scripts/render_video.py`: each generated plate receives gentle Ken Burns camera movement, scene-appropriate atmospheric motion and a short dissolve at cuts. If no generated plate exists, the local illustrated renderer remains the fallback.
+- Added optional Cloudflare scene generation to both the automatic visual-proof workflow and the Charon MP4 pilot. No token is stored in source; the optional secrets are `CLOUDFLARE_ACCOUNT_ID` and `CLOUDFLARE_API_TOKEN`.
+- Updated CI with prompt/multipart tests and README with Cloudflare setup and free-tier limits.
+- Cloudflare official pricing currently lists 10,000 Workers AI Neurons/day on the Free Workers plan; this is a bounded daily allowance, not unlimited. The optional image path requires a Cloudflare API token with Workers AI permissions. See Cloudflare pricing/model docs in the README.
+- Important boundary: AI scene plates are still illustrations with camera movement/dissolves, not full frame-by-frame character rig animation. A new pilot with the Cloudflare secrets configured is needed to inspect the generated art quality and continuity.
