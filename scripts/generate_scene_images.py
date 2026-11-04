@@ -164,7 +164,7 @@ def main():
         last_error = None
         for attempt in range(3):
             try:
-                raw = call_cloudflare(account, token, prompt, a.seed + i, reference if i > 0 else None)
+                raw = call_cloudflare(account, token, prompt, a.seed + i, reference)
                 out.write_bytes(raw)
                 generated += 1
                 print(f"Generated scene {i+1}/{min(len(scenes),a.max_images)}: {out.name}", flush=True)
