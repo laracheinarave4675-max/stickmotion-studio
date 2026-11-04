@@ -269,11 +269,11 @@ def draw_scene(scene,index,t,duration,caption):
     elif shot==1: # medium two-shot / character and prop
         scale=1.18; cx=SW*.43; base=455
     elif shot==2: # emotional close-up
-        scale=2.35; cx=SW*.50; base=545
+        scale=4.0; cx=SW*.50; base=1300
     else: # off-centre cinematic composition
         scale=1.28; cx=SW*.34; base=460
     # subtle distant crowd in historical/war/city scenes
-    if visual in ("historical","war","conversation","disaster") and shot in (0,1):
+    if visual in ("historical","war","conversation","disaster","village") and shot in (0,1):
         for j in range(9):
             px=70+j*100
             draw_character(d,px,382,.36,t*.5,"observing or explaining","explaining",j+2)
@@ -282,7 +282,7 @@ def draw_scene(scene,index,t,duration,caption):
         partner_x=min(850,cx+245)
         draw_character(d,partner_x,base,scale*.78,t+1.1,"observing or explaining","worried" if mood=="worried" else "thinking",index+3)
     # main character
-    draw_character(d,cx,base,scale,t,action,mood,index)
+    draw_character(d,cx,base,scale,t,action,mood,index,close=(shot==2))
     props=scene.get("props",[])
     if props and shot!=2:
         px=min(850,cx+105*scale); py=base-150*scale
