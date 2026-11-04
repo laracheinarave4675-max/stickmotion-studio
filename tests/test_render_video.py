@@ -30,10 +30,17 @@ class RendererTests(unittest.TestCase):
 
     def test_illustrated_scene_uses_distinct_camera_framing(self):
         scene = MODULE.load_scenes("The detective examined the evidence folder in the investigation room.")[0]
-        wide = MODULE.draw_scene(scene, 0, 0.5, 5.0, "")
-        close = MODULE.draw_scene(scene, 2, 0.5, 5.0, "")
+        wide = MODULE.draw_scene(scene, 3, 0.5, 5.0, "")
+        close = MODULE.draw_scene(scene, 1, 0.5, 5.0, "")
         self.assertEqual(wide.size, (960, 540))
         self.assertIsNotNone(ImageChops.difference(wide, close).getbbox())
+
+    def test_close_up_contains_visible_face_details(self):
+        scene = MODULE.load_scenes("The detective examined the evidence folder in the investigation room.")[0]
+        frame = MODULE.draw_scene(scene, 1, 0.5, 5.0, "")
+        face_region = frame.crop((330, 80, 630, 390))
+        dark_pixels = sum(1 for pixel in face_region.getdata() if max(pixel) < 75)
+        self.assertGreater(dark_pixels, 80)
 
     def test_renderer_exposes_reference_style_features(self):
         scene = MODULE.load_scenes("The soldiers marched through the old city during the war.")[0]
