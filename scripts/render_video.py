@@ -255,6 +255,10 @@ def draw_scene(scene,index,t,duration,caption):
         for j in range(9):
             px=70+j*100
             draw_character(d,px,382,.36,t*.5,"observing or explaining","explaining",j+2)
+    # Supporting cast turns a single-person pose into a staged story beat.
+    if shot==1 and (visual in ("conversation","investigation","crime","historical","war") or action in ("speaking or arguing","helping or rescuing","reaching or handing over")):
+        partner_x=min(850,cx+245)
+        draw_character(d,partner_x,base,scale*.78,t+1.1,"observing or explaining","worried" if mood=="worried" else "thinking",index+3)
     # main character
     draw_character(d,cx,base,scale,t,action,mood,index)
     props=scene.get("props",[])
@@ -286,7 +290,7 @@ def draw_scene(scene,index,t,duration,caption):
     im=im.crop((ox,oy,ox+SW,oy+SH))
     # cinematic soft vignette
     shade=Image.new("L",(SW,SH),0); sd=ImageDraw.Draw(shade)
-    sd.ellipse((-SW*.12,-SH*.18,SW*1.12,SH*1.18),fill=210)
+    sd.ellipse((-SW*.12,-SH*.18,SW*1.12,SH*1.18),fill=255)
     shade=shade.filter(ImageFilter.GaussianBlur(45))
     dark=Image.new("RGB",(SW,SH),(12,14,17))
     im=Image.composite(im,dark,shade)
