@@ -256,3 +256,8 @@ Never confuse a successful static-site deployment with a finished video generato
 - The close-up rig now renders a real enlarged face; classroom and home/piano sets are present. The procedural result remains visibly simpler than the user's reference videos and is not the final visual target.
 - Renderer/AI-scene CI passed, including prompt, multipart-reference, scene-classification, close-up-face and audio tests.
 - Next required action for the intended art quality: add repository Actions secrets `CLOUDFLARE_ACCOUNT_ID` and `CLOUDFLARE_API_TOKEN` (Workers AI Read + Edit permissions), then rerun the visual proof. This enables FLUX.2 Klein 4B scene artwork under Cloudflare's daily free allocation. Do not claim AI artwork has been generated until a later artifact reports a nonzero AI scene count.
+
+
+## 2026-11-04 — preserve Actions quota
+- Removed automatic push-triggered full visual renders; the 18-second proof workflow is now manual-only because repeated commits were launching redundant MP4 jobs.
+- Renderer CI now runs once per push to the working branch (not again for each draft-PR synchronization). This avoids unnecessary GitHub Actions usage while keeping checks active.
