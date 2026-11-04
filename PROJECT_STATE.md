@@ -248,3 +248,11 @@ Never confuse a successful static-site deployment with a finished video generato
 - Updated CI with prompt/multipart tests and README with Cloudflare setup and free-tier limits.
 - Cloudflare official pricing currently lists 10,000 Workers AI Neurons/day on the Free Workers plan; this is a bounded daily allowance, not unlimited. The optional image path requires a Cloudflare API token with Workers AI permissions. See Cloudflare pricing/model docs in the README.
 - Important boundary: AI scene plates are still illustrations with camera movement/dissolves, not full frame-by-frame character rig animation. A new pilot with the Cloudflare secrets configured is needed to inspect the generated art quality and continuity.
+
+
+## 2026-11-04 — proof after geometry and AI pipeline integration
+- Latest automatic visual proof completed successfully on commit `7ece2889074d7b21259e8cfe3e240addd75ce8eb`, run `41791048561`. MP4: 18 seconds, H.264/AAC, 1920×1080, 30 fps.
+- Metadata confirms `ai_generated_scene_count: 0`: the Cloudflare credentials are not configured in this repository, so the successful proof used the procedural fallback. The AI image generation script is unit-tested, but its live API path has not yet been exercised.
+- The close-up rig now renders a real enlarged face; classroom and home/piano sets are present. The procedural result remains visibly simpler than the user's reference videos and is not the final visual target.
+- Renderer/AI-scene CI passed, including prompt, multipart-reference, scene-classification, close-up-face and audio tests.
+- Next required action for the intended art quality: add repository Actions secrets `CLOUDFLARE_ACCOUNT_ID` and `CLOUDFLARE_API_TOKEN` (Workers AI Read + Edit permissions), then rerun the visual proof. This enables FLUX.2 Klein 4B scene artwork under Cloudflare's daily free allocation. Do not claim AI artwork has been generated until a later artifact reports a nonzero AI scene count.
