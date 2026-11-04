@@ -31,6 +31,15 @@ def make_prompt(scene: dict, index: int, total: int, protagonist: str) -> str:
     action = scene.get("action", "show the character physically doing the action described")
     mood = scene.get("mood", "emotion clearly visible in face and posture")
     setting = scene.get("setting", "a specific, fully dressed story location")
+    shot_patterns = [
+        "wide establishing composition showing the location and one clear focal action",
+        "tight over-the-shoulder composition focused on the hands and important object",
+        "low three-quarter medium shot with the protagonist dominating the foreground",
+        "high-angle composition revealing the geography and character positions",
+        "intimate facial close-up with the relevant story object visible",
+        "wide cinematic aftermath composition with strong foreground, middle ground and background layers",
+    ]
+    shot = shot_patterns[index % len(shot_patterns)]
     return (
         f"{STYLE}\\n"
         f"Create a single coherent illustrated frame for scene {index + 1} of {total}. "
@@ -43,7 +52,7 @@ def make_prompt(scene: dict, index: int, total: int, protagonist: str) -> str:
         f"Location and environment: {setting}. "
         f"Visible physical action (must be unmistakable at a glance): {action}. "
         f"Emotion and body language: {mood}. Essential story props being handled or interacted with: {props}. "
-        f"Camera direction: {camera}. "
+        f"Camera direction: {camera}. Required composition variation: {shot}. "
         f"Narration beat to dramatize: {narration}. "
         "Compose a specific narrative moment, not a generic group portrait. "
         "The people must interact with the environment and props: hands grasp, point, open, carry, write, reach, "
@@ -53,7 +62,11 @@ def make_prompt(scene: dict, index: int, total: int, protagonist: str) -> str:
         "layered painted background, consistent ink weight, restrained cinematic color grading, strong readable silhouettes. "
         "Do not use 3D plastic toy aesthetics, bare stick figures, black line bodies, spherical blank heads, "
         "generic empty backgrounds, random props, or repeated static poses. "
-        "If a style reference image is provided, match its illustration language and character design faithfully."
+        "If a reference image is provided, use it ONLY to preserve the lead character's face, hair, clothing design, line quality and palette. "
+        "Do NOT copy its camera angle, pose, group arrangement, background, furniture, props or composition. "
+        "Every scene must be a visibly different illustration with a new camera position and a new physical action. "
+        "Never repeat the same group portrait or room layout unless the narration explicitly requires it. "
+        "Absolutely no text, fake writing, pseudo-letters, labels, signs, captions, speech bubbles or typography anywhere."
     )[:3000]
 
 def multipart(fields: dict[str, str], files: dict[str, tuple[str, bytes, str]]) -> tuple[bytes, str]:
@@ -126,7 +139,7 @@ def main():
     if not scenes:
         raise SystemExit("No scenes were produced from narration.")
     a.output_dir.mkdir(parents=True, exist_ok=True)
-    reference_path = a.output_dir / "style-reference.jpg"
+    reference_path = a.output_dir / "character-reference.jpg"
     reference = reference_path.read_bytes() if reference_path.exists() else None
     generated = 0
     for i, scene in enumerate(scenes[:max(0, a.max_images)]):
@@ -134,7 +147,15 @@ def main():
         if out.exists() and out.stat().st_size > 50000:
             if i == 0 and not reference:
                 with Image.open(out) as image:
-                    image.convert("RGB").resize((512, 288), Image.Resampling.LANCZOS).save(reference_path, "JPEG", quality=88)
+                    image = image.convert("RGB")
+                    w, h = image.size
+                    # Isolate the lead character region so later generations inherit character design,
+                    # not the first scene's full group layout and background.
+                    crop = image.crop((int(w * 0.22), int(h * 0.08), int(w * 0.68), int(h * 0.94)))
+                    canvas = Image.new("RGB", (512, 288), (224, 216, 199))
+                    crop.thumbnail((280, 270), Image.Resampling.LANCZOS)
+                    canvas.paste(crop, ((512 - crop.width) // 2, (288 - crop.height) // 2))
+                    canvas.save(reference_path, "JPEG", quality=92)
                     reference = reference_path.read_bytes()
             continue
         prompt = make_prompt(scene, i, len(scenes), a.protagonist)
@@ -147,7 +168,13 @@ def main():
                 print(f"Generated scene {i+1}/{min(len(scenes),a.max_images)}: {out.name}", flush=True)
                 if i == 0 and not reference:
                     with Image.open(out) as image:
-                        image.convert("RGB").resize((512, 288), Image.Resampling.LANCZOS).save(reference_path, "JPEG", quality=88)
+                        image = image.convert("RGB")
+                        w, h = image.size
+                        crop = image.crop((int(w * 0.22), int(h * 0.08), int(w * 0.68), int(h * 0.94)))
+                        canvas = Image.new("RGB", (512, 288), (224, 216, 199))
+                        crop.thumbnail((280, 270), Image.Resampling.LANCZOS)
+                        canvas.paste(crop, ((512 - crop.width) // 2, (288 - crop.height) // 2))
+                        canvas.save(reference_path, "JPEG", quality=92)
                     reference = reference_path.read_bytes()
                 break
             except Exception as exc:
