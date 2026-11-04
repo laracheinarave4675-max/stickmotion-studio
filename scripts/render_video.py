@@ -11,6 +11,9 @@ SW, SH = 960, 540
 MAX_SECONDS = 90
 PALETTES = {
  "historical": ((207,205,190),(238,224,194),(80,73,64),(48,47,46)),
+ "classroom": ((206,204,184),(235,222,190),(111,89,67),(44,43,39)),
+ "home": ((88,83,76),(151,120,89),(111,84,61),(40,35,31)),
+ "village": ((177,199,202),(229,211,177),(183,163,125),(58,52,43)),
  "crime": ((34,39,48),(62,66,73),(178,164,139),(24,25,29)),
  "investigation": ((49,57,66),(83,89,91),(206,190,155),(25,29,32)),
  "prison": ((82,88,82),(117,117,103),(194,181,150),(32,36,34)),
@@ -68,7 +71,7 @@ def draw_background(d,visual,t):
     if visual not in ("crime","investigation","prison","night","science","clock"):
         draw_cloud(d,140+int(math.sin(t*.08)*8),80,.8,(225,222,207))
         draw_cloud(d,690,62,.55,(231,226,208))
-    if visual in ("historical","war","disaster","journey","conversation"):
+    if visual in ("historical","war","disaster","journey","conversation","village"):
         d.rectangle((0,0,SW,SH),fill=sky)
         # street perspective and varied facades
         draw_building(d,-15,355,190,245,(204,190,163),(107,79,62),ink)
@@ -88,7 +91,7 @@ def draw_background(d,visual,t):
                 d.polygon([(x,340),(x+28,270),(x+60,340)],fill=(87,86,75))
             for x in (110,480,810):
                 d.ellipse((x,320,x+34,334),fill=(57,56,49))
-    elif visual in ("room","conversation","investigation","prison","crime","science","clock"):
+    elif visual in ("room","conversation","investigation","prison","crime","science","clock","classroom","home"):
         # interior walls with wood wainscot, windows, framed art and floorboards
         d.rectangle((0,0,SW,SH),fill=mid)
         d.rectangle((0,350,SW,SH),fill=(128,105,82))
@@ -111,6 +114,25 @@ def draw_background(d,visual,t):
             d.line((580,235,860,235),fill=(205,211,194),width=2)
             for i,h in enumerate((60,105,145,190)):
                 d.rectangle((600+i*58,235-h,630+i*58,235),fill=(107,153,166),outline=(221,220,194),width=2)
+        elif visual=="classroom":
+            rounded(d,(560,70,900,265),4,(43,82,66),(28,39,34),5)
+            d.line((590,110,850,110),fill=(222,219,190),width=2)
+            d.line((590,150,790,150),fill=(222,219,190),width=2)
+            d.line((590,190,825,190),fill=(222,219,190),width=2)
+            for x in (115,300,470):
+                rounded(d,(x,335,x+95,360),4,(132,91,58),ink,2)
+                d.line((x+10,360,x+5,410),fill=ink,width=3)
+                d.line((x+85,360,x+90,410),fill=ink,width=3)
+        elif visual=="home":
+            # upright piano, warm lamp and curtains
+            d.rectangle((565,245,835,340),fill=(92,59,42),outline=ink,width=4)
+            d.rectangle((580,260,820,286),fill=(45,39,35),outline=ink,width=2)
+            for k in range(14):
+                x=585+k*16
+                d.rectangle((x,286,x+12,309),fill=(237,228,205),outline=ink,width=1)
+            d.line((590,340,590,420),fill=ink,width=5); d.line((810,340,810,420),fill=ink,width=5)
+            d.line((30,45,30,300),fill=(103,68,58),width=5)
+            d.line((250,45,250,300),fill=(103,68,58),width=5)
         elif visual=="prison":
             for x in (520,600,680,760,840):
                 d.line((x,0,x,SH),fill=(43,47,46),width=8)
@@ -138,8 +160,8 @@ def draw_character(d,cx,base,scale,t,action,mood,variant=0,close=False):
     coats=[(47,61,76),(91,73,57),(72,84,68),(83,81,78),(116,82,52),(53,62,67)]
     coat=coats[variant%len(coats)]
     bob=math.sin(t*3+variant)*2.2
-    headw=32 if not close else 73; headh=39 if not close else 85
-    bodyh=100 if not close else 190
+    headw=48 if not close else 120; headh=58 if not close else 145
+    bodyh=180 if not close else 330
     def P(x,y): return (cx+x*scale,base+y*scale)
     # legs behind coat
     stride=math.sin(t*5+variant)*13 if action in ("running","walking or travelling","fighting") else math.sin(t*2+variant)*2
@@ -243,13 +265,13 @@ def draw_scene(scene,index,t,duration,caption):
     shot=(index+1)%4
     if mood=="worried": shot=2
     if shot==0: # establishing: people small, place dominates
-        scale=.78; cx=SW*.50; base=440
+        scale=.86; cx=SW*.50; base=450
     elif shot==1: # medium two-shot / character and prop
-        scale=1.08; cx=SW*.48; base=478
+        scale=1.18; cx=SW*.43; base=455
     elif shot==2: # emotional close-up
-        scale=1.65; cx=SW*.50; base=520
+        scale=2.35; cx=SW*.50; base=545
     else: # off-centre cinematic composition
-        scale=1.0; cx=SW*.34; base=485
+        scale=1.28; cx=SW*.34; base=460
     # subtle distant crowd in historical/war/city scenes
     if visual in ("historical","war","conversation","disaster") and shot in (0,1):
         for j in range(9):
@@ -298,7 +320,7 @@ def draw_scene(scene,index,t,duration,caption):
     # subtitle panel with readable two-line safe margins
     if caption:
         lines=wrap(caption,width=78)[:2]
-        y=SH-70
+        y=SH-48
         rounded(d,(55,y-8,905,SH-12),8,(15,17,19),(15,17,19),1)
         for j,txt in enumerate(lines):
             d.text((SW//2,y+j*23),txt,font=font(17,True),fill=(250,248,239),anchor="ma")
@@ -328,7 +350,7 @@ def main():
     for i,(scene,dur) in enumerate(zip(scenes,durations),1):
         start=cursor; cursor+=dur; srt.append(f"{i}\n{stamp(start)} --> {stamp(cursor)}\n{scene['narration']}\n")
     args.output.with_suffix(".srt").write_text("\n".join(srt),encoding="utf-8")
-    meta={"renderer":"layered illustrated 2D cartoon + Pillow/FFmpeg","resolution":"1920x1080","fps":FPS,"audio_seconds":round(audio_duration,3),"scene_count":len(scenes),"voice":"mono narration WAV supplied","captions":"burned in; scene-weighted timing","music":"procedural cinematic underscore ducked under narration","sound_effects":"procedural event cues","visual_features":["period/location-specific illustrated environments","individualized clothed characters with facial expressions","crowd layers","wide/medium/close shot variation","subtle camera drift and zoom"],"limitations":["characters and sets are procedural vector-style illustrations, not hand-animated frame-by-frame","scene timing is estimated by narration word count"]}
+    meta={"renderer":"layered illustrated 2D cartoon + Pillow/FFmpeg","resolution":"1920x1080","fps":FPS,"audio_seconds":round(audio_duration,3),"scene_count":len(scenes),"voice":"mono narration WAV supplied","captions":"burned in; scene-weighted timing","music":"procedural cinematic underscore ducked under narration","sound_effects":"procedural event cues","visual_features":["period/location-specific illustrated environments including streets, classrooms and homes","individualized clothed characters with facial expressions","crowd layers","wide/medium/close shot variation","subtle camera drift and zoom"],"limitations":["characters and sets are procedural vector-style illustrations, not hand-animated frame-by-frame","scene timing is estimated by narration word count"]}
     args.output.with_suffix(".json").write_text(json.dumps(meta,indent=2),encoding="utf-8")
     ffmpeg_bin=shutil.which("ffmpeg")
     if not ffmpeg_bin:
