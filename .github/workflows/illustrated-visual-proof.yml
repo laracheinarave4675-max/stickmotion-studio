@@ -1,0 +1,50 @@
+name: Build illustrated visual proof
+
+on:
+  push:
+    branches: [reference-style-animation]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  render-visual-proof:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install free rendering tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ffmpeg espeak-ng
+          python -m pip install --disable-pip-version-check pillow
+      - name: Create short sample narration and voice
+        run: |
+          mkdir -p output
+          cat > output/narration.txt <<'EOF'
+          In the winter of 1916, a young soldier arrived at the front line. The streets behind him were crowded with frightened families, while officers read the latest orders to the men.
+          Inside a cold classroom, children tried to continue their lessons as the distant guns shook the windows. At home, a mother sat beside the piano, waiting for news that might never come.
+          By nightfall, the village had changed. The soldiers marched past darkened houses, carrying letters and memories of the lives they had left behind.
+          EOF
+          espeak-ng -v en-us+m3 -s 145 -a 155 -w output/narration.wav -f output/narration.txt
+      - name: Render illustrated MP4
+        run: python scripts/render_video.py --narration output/narration.txt --voice output/narration.wav --output output/illustrated-visual-proof.mp4
+      - name: Upload visual proof
+        uses: actions/upload-artifact@v4
+        with:
+          name: stickmotion-illustrated-visual-proof
+          path: |
+            output/illustrated-visual-proof.mp4
+            output/illustrated-visual-proof.srt
+            output/illustrated-visual-proof.json
+            output/narration.wav
+            output/narration.txt
+          retention-days: 3
