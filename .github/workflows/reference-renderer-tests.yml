@@ -3,8 +3,6 @@ name: Reference renderer tests
 on:
   push:
     branches: [reference-style-animation]
-  pull_request:
-    branches: [main]
 
 permissions:
   contents: read
