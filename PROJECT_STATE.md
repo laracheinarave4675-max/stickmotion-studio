@@ -201,3 +201,9 @@ Never confuse a successful static-site deployment with a finished video generato
 - Added `.github/workflows/illustrated-visual-proof.yml`: on updates to the reference branch it creates a short English historical-story narration, synthesizes a temporary open-source espeak-ng voice, renders the actual 1080p MP4 through the new illustrated renderer, and uploads MP4/SRT/metadata as a 3-day artifact.
 - This proof is for visual pipeline validation only; espeak-ng is not the chosen production narrator. The Charon/Gemini workflow remains the intended voice path.
 - Awaiting the first complete rendered artifact and inspection of its frames/metadata before claiming the new visual approach works end-to-end.
+
+
+## 2026-11-04 — visual proof workflow made deterministic
+- Removed the package-manager dependency from the visual proof workflow after the hosted runner spent excessive time in apt installation.
+- The proof now uses the runner's FFmpeg and a small deterministic mono test track generated in Python. It validates frame composition, MP4 encoding, scene sequencing and subtitles; it is explicitly not a voice-quality or final audio-mix test.
+- Renderer metadata now describes its audio input generically as a supplied mono narration WAV.
