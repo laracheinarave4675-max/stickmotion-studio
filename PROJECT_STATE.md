@@ -221,3 +221,9 @@ Never confuse a successful static-site deployment with a finished video generato
 - Frame inspection exposed a real visual defect: character scale was too small and subtitle panel obscured much of the lower body; several narration beats fell into a generic empty room.
 - Corrected character proportions and shot scales (wide/medium/close), moved subtitle panel down, and added explicit classroom, home/piano, and village environment categories with dedicated scene dressing. Expanded planner tests for those categories.
 - This fixes the specific issues visible in the first proof, but a new proof render is required to verify the improved composition.
+
+
+## 2026-11-04 — stronger emotional close-up framing
+- Increased close-up shot scale and switched the character rig to its enlarged head/face proportions for close-up beats; village establishing shots also include a background crowd.
+- This follows inspection of the first proof, where the supposed close-up was still too distant.
+- New proof run is required to validate these latest framing changes.
