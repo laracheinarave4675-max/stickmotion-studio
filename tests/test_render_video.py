@@ -42,6 +42,13 @@ class RendererTests(unittest.TestCase):
         dark_pixels = sum(1 for pixel in face_region.getdata() if max(pixel) < 75)
         self.assertGreater(dark_pixels, 80)
 
+    def test_character_animation_changes_pose_over_time(self):
+        scene = MODULE.load_scenes("The officer explained the plan to the frightened soldier.")[0]
+        scene["action"] = "speaking or arguing"
+        first = MODULE.draw_scene(scene, 1, 0.1, 5.0, "")
+        later = MODULE.draw_scene(scene, 1, 0.8, 5.0, "")
+        self.assertIsNotNone(ImageChops.difference(first, later).getbbox())
+
     def test_renderer_exposes_reference_style_features(self):
         scene = MODULE.load_scenes("The soldiers marched through the old city during the war.")[0]
         frame = MODULE.draw_scene(scene, 1, 1.0, 5.0, scene["narration"])
