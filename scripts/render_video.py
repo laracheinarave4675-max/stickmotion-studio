@@ -346,6 +346,29 @@ def draw_scene_image(plate, scene, index, t, caption):
     im=im.crop((ox,oy,ox+SW,oy+SH))
     d=ImageDraw.Draw(im)
     visual=scene.get("visual","")
+    action=scene.get("action","observing or explaining")
+    mood=scene.get("mood","explaining")
+    # Composite reusable animated character rigs over the AI-generated environment.
+    # Background plates contain no people, so the same character design remains consistent
+    # while limbs, expressions and mouth shapes animate independently on every frame.
+    shot=index%3
+    if mood=="worried" and shot==0:
+        shot=1
+    if shot==0:
+        cx,base,scale=SW*.51,470,.82
+    elif shot==1:
+        cx,base,scale=SW*.39,478,1.02
+    else:
+        cx,base,scale=SW*.50,625,1.38
+    interactive=(visual in ("conversation","investigation","crime","historical","war","classroom","home")
+                 or action in ("speaking or arguing","helping or rescuing","reaching or handing over"))
+    if shot==1 and interactive:
+        draw_character(d,min(850,cx+260),base,scale*.76,t+1.1,"observing or explaining",
+                       "worried" if mood=="worried" else "thinking",index+3)
+    draw_character(d,cx,base,scale,t,action,mood,index,close=(shot==2))
+    props=scene.get("props",[])
+    if props and shot!=2:
+        draw_prop(d,props[0],min(875,cx+115*scale),base-145*scale,(31,30,29))
     if visual in ("war","disaster","shipwreck","wilderness","desert"):
         for k in range(5):
             x=(k*181+int(t*12))%SW
