@@ -19,7 +19,8 @@ class SceneImageTests(unittest.TestCase):
             "camera": "tight medium shot"
         }
         prompt = MODULE.make_prompt(scene, 0, 5, "young soldier in a navy uniform")
-        self.assertIn("young soldier in a navy uniform", prompt)
+        self.assertIn("background environment plate only", prompt)
+        self.assertIn("Do not draw any people", prompt)
         self.assertIn("reads a letter", prompt)
         self.assertIn("hand-drawn 2D", prompt)
         self.assertLessEqual(len(prompt), 2048)
