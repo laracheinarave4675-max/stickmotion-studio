@@ -19,10 +19,10 @@ class SceneImageTests(unittest.TestCase):
             "camera": "tight medium shot"
         }
         prompt = MODULE.make_prompt(scene, 0, 5, "young soldier in a navy uniform")
-        self.assertIn("background environment plate only", prompt)
-        self.assertIn("Do not draw any people", prompt)
+        self.assertIn("classic stick figure", prompt)
+        self.assertIn("NO human body", prompt)
         self.assertIn("reads a letter", prompt)
-        self.assertIn("hand-drawn 2D", prompt)
+        self.assertIn("3D environments", prompt)
         self.assertLessEqual(len(prompt), 2048)
 
     def test_multipart_request_encodes_reference_image(self):
