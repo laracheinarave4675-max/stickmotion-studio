@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Illustrated 2D story-cartoon renderer: layered sets, expressive characters and directed shots."""
+"""Cinematic StickMotion renderer with dimensional stickman scenes and mixed audio."""
 from __future__ import annotations
 import argparse, json, math, subprocess, sys, wave, random, shutil
 from pathlib import Path
@@ -354,15 +354,16 @@ def draw_scene_image(plate, scene, index, t, caption):
     # broken anatomy, doubled outlines and a visibly cutout character layer.
     im=ImageOps.fit(plate,(SW,SH),method=Image.Resampling.LANCZOS)
     camera=str(scene.get("camera","medium shot")).lower()
+    # Directed virtual-camera moves: dolly, crane and tracking-style motion.
     if "wide" in camera or "establishing" in camera:
-        base_zoom=1.015; pan_x=math.sin(t*.16+index*.7)*10; pan_y=math.cos(t*.13+index)*4
+        base_zoom=1.035; pan_x=math.sin(t*.22+index*.7)*22; pan_y=math.cos(t*.17+index)*10
     elif "close" in camera or "tight" in camera or scene.get("mood")=="worried":
-        base_zoom=1.075; pan_x=math.sin(t*.20+index)*5; pan_y=math.cos(t*.18+index)*3
+        base_zoom=1.105; pan_x=math.sin(t*.24+index)*12; pan_y=math.cos(t*.20+index)*8
     elif "over" in camera or "tracking" in camera or scene.get("mood")=="active":
-        base_zoom=1.055; pan_x=math.sin(t*.32+index)*13; pan_y=math.cos(t*.20+index)*6
+        base_zoom=1.075; pan_x=math.sin(t*.38+index)*30; pan_y=math.cos(t*.25+index)*13
     else:
-        base_zoom=1.04; pan_x=math.sin(t*.22+index*.8)*8; pan_y=math.cos(t*.16+index)*4
-    zoom=base_zoom+0.012*math.sin(t*.42+index*.3)
+        base_zoom=1.06; pan_x=math.sin(t*.28+index*.8)*19; pan_y=math.cos(t*.19+index)*9
+    zoom=base_zoom+0.018*math.sin(t*.48+index*.3)
     nw,nh=int(SW*zoom),int(SH*zoom)
     im=im.resize((nw,nh),Image.Resampling.LANCZOS)
     ox=max(0,min(nw-SW,(nw-SW)//2+int(pan_x)))
