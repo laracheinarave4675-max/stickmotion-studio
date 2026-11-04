@@ -97,4 +97,5 @@ jobs:
             output/sfx.wav
             output/narration.txt
             output/scenes/*.png
+            output/scenes/character-reference.jpg
           retention-days: 3
