@@ -11,6 +11,7 @@ SW, SH = 960, 540
 MAX_SECONDS = 90
 PALETTES = {
  "historical": ((207,205,190),(238,224,194),(80,73,64),(48,47,46)),
+ "railway": ((181,190,192),(220,207,181),(83,75,65),(42,43,43)),
  "classroom": ((206,204,184),(235,222,190),(111,89,67),(44,43,39)),
  "home": ((88,83,76),(151,120,89),(111,84,61),(40,35,31)),
  "village": ((177,199,202),(229,211,177),(183,163,125),(58,52,43)),
@@ -71,7 +72,7 @@ def draw_background(d,visual,t):
     if visual not in ("crime","investigation","prison","night","science","clock"):
         draw_cloud(d,140+int(math.sin(t*.08)*8),80,.8,(225,222,207))
         draw_cloud(d,690,62,.55,(231,226,208))
-    if visual in ("historical","war","disaster","journey","conversation","village"):
+    if visual in ("historical","war","disaster","journey","conversation","village","railway"):
         d.rectangle((0,0,SW,SH),fill=sky)
         # street perspective and varied facades
         draw_building(d,-15,355,190,245,(204,190,163),(107,79,62),ink)
@@ -85,6 +86,19 @@ def draw_background(d,visual,t):
             d.line((390-k*28,yy,570+k*30,yy),fill=(151,139,119),width=1)
         # paving seams and curb
         for x in range(-50,1050,90): d.line((x,355,x+(x-480)*.35,SH),fill=(143,132,114),width=1)
+        if visual=="railway":
+            # Simple period steam locomotive and tracks for the non-AI fallback.
+            d.rectangle((340,245,820,340),fill=(48,53,55),outline=ink,width=4)
+            d.rectangle((420,190,590,260),fill=(54,59,60),outline=ink,width=4)
+            d.ellipse((385,310,465,390),fill=(34,36,37),outline=(190,180,158),width=5)
+            d.ellipse((660,310,740,390),fill=(34,36,37),outline=(190,180,158),width=5)
+            d.rectangle((0,405,SW,SH),fill=(91,83,71))
+            for y in (438,480,522):
+                d.line((0,y,SW,y),fill=(49,48,45),width=5)
+            for x in range(0,SW,58):
+                d.line((x,425,x+12,SH),fill=(126,107,84),width=4)
+            for sx,sy in ((560,160),(620,125),(680,95)):
+                ellipse(d,(sx-35,sy-18,sx+35,sy+18),(188,187,179),(188,187,179),1)
         if visual=="war":
             d.rectangle((0,300,SW,SH),fill=(115,108,91))
             for x in (80,250,730,870):
