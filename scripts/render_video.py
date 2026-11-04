@@ -374,15 +374,22 @@ def draw_scene_image(plate, scene, index, t, caption):
         cx,base,scale=SW*.39,478,1.02
     else:
         cx,base,scale=SW*.50,515,1.30
+    # Keep the character layer registered to the drifting/zooming background plate.
+    # Tiny independent body motion prevents a pasted-on, motionless cutout effect.
+    camera_x=math.sin(t*.19+index)*8
+    camera_y=math.cos(t*.17+index)*5
+    layer_scale=scale*zoom
+    cx-=camera_x
+    base-=camera_y
     interactive=(visual in ("conversation","investigation","crime","historical","war","classroom","home")
                  or action in ("speaking or arguing","helping or rescuing","reaching or handing over"))
     if shot==1 and interactive:
-        draw_character(d,min(850,cx+260),base,scale*.76,t+1.1,"observing or explaining",
+        draw_character(d,min(850,cx+260*zoom),base,layer_scale*.76,t+1.1,"observing or explaining",
                        "worried" if mood=="worried" else "thinking",3)
-    draw_character(d,cx,base,scale,t,action,mood,0,close=(shot==2))
+    draw_character(d,cx,base,layer_scale,t,action,mood,0,close=(shot==2))
     props=scene.get("props",[])
     if props and shot!=2:
-        draw_prop(d,props[0],min(875,cx+115*scale),base-145*scale,(31,30,29))
+        draw_prop(d,props[0],min(875,cx+115*layer_scale),base-145*layer_scale,(31,30,29))
     if visual in ("war","disaster","shipwreck","wilderness","desert"):
         for k in range(5):
             x=(k*181+int(t*12))%SW
