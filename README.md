@@ -77,7 +77,7 @@ Renderer notes: long captions are paginated into readable two-line screens durin
 
 The renderer can replace its procedural scene drawings with bespoke 2D illustrations generated from each narration beat. It uses Cloudflare's hosted **FLUX.2 Klein 4B** model and reuses the first generated scene as a visual reference for later scenes to encourage character and style continuity.
 
-Cloudflare Workers AI currently includes **10,000 Neurons per day on the Free Workers plan**, resetting at 00:00 UTC. This is a daily allowance, not unlimited generation; requests stop when the free allocation is exhausted. FLUX.2 Klein 4B supports multi-reference images and fixed four-step generation. Check Cloudflare's current pricing and model terms before large runs.
+Cloudflare Workers AI currently includes **10,000 Neurons per day on the Free Workers plan**, resetting at 00:00 UTC. This is a daily allowance, not unlimited generation; requests stop when the free allocation is exhausted. FLUX.2 Klein 4B supports up to four reference images and fixed four-step generation. See the [official Workers AI pricing](https://developers.cloudflare.com/workers-ai/platform/pricing/) and [FLUX.2 Klein 4B model documentation](https://developers.cloudflare.com/workers-ai/models/flux-2-klein-4b/) before large runs.
 
 To enable the optional path:
 
