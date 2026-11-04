@@ -171,7 +171,7 @@ def draw_character(d,cx,base,scale,t,action,mood,variant=0,close=False):
     ellipse(d,(cx+(-25+stride)*scale,base-8*scale,cx+(-7+stride)*scale,base+1*scale),ink,ink,1)
     ellipse(d,(cx+(8-stride)*scale,base-8*scale,cx+(27-stride)*scale,base+1*scale),ink,ink,1)
     # jacket torso
-    rounded(d,(cx-23*scale,base-bodyh*.75,cx+23*scale,base-bodyh*.18),7*scale,coat,ink,max(2,int(4*scale)))
+    rounded(d,(cx-23*scale,base-bodyh*.75*scale,cx+23*scale,base-bodyh*.18*scale),7*scale,coat,ink,max(2,int(4*scale)))
     # shirt and tie
     d.polygon([P(-8,-bodyh*.74),P(8,-bodyh*.74),P(4,-bodyh*.28),P(0,-bodyh*.22),P(-4,-bodyh*.28)],fill=(242,237,219),outline=ink)
     d.polygon([P(-2,-bodyh*.68),P(3,-bodyh*.68),P(5,-bodyh*.35),P(0,-bodyh*.29),P(-4,-bodyh*.35)],fill=(76,45,42),outline=ink)
@@ -195,7 +195,7 @@ def draw_character(d,cx,base,scale,t,action,mood,variant=0,close=False):
     for hand in (left2,right2):
         ellipse(d,(hand[0]-5*scale,hand[1]-5*scale,hand[0]+5*scale,hand[1]+5*scale),skin,ink,max(1,int(2*scale)))
     # head and hair
-    hy=base-bodyh*.80+bob*scale
+    hy=base-bodyh*.80*scale+bob*scale
     ellipse(d,(cx-headw*scale/2,hy-headh*scale/2,cx+headw*scale/2,hy+headh*scale/2),skin,ink,max(2,int(3*scale)))
     hair=["short","side","bald","hat","cap","long"][variant%6]
     if hair=="short":
@@ -236,7 +236,7 @@ def draw_character(d,cx,base,scale,t,action,mood,variant=0,close=False):
     # lapel and buttons
     inkline(d,[P(-9,-bodyh*.72),P(0,-bodyh*.58),P(9,-bodyh*.72)],(220,211,190),max(1,int(2*scale)))
     for by in (.48,.58,.67):
-        ellipse(d,(cx-2*scale,base-bodyh*by-2*scale,cx+2*scale,base-bodyh*by+2*scale),ink,ink,1)
+        ellipse(d,(cx-2*scale,base-bodyh*by*scale-2*scale,cx+2*scale,base-bodyh*by*scale+2*scale),ink,ink,1)
 def draw_prop(d,name,x,y,ink):
     n=name.lower()
     if any(k in n for k in ("map","document","letter","evidence","photograph","note","book")):
