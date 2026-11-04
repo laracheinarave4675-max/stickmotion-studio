@@ -1,0 +1,73 @@
+name: Render fresh StickMotion visual sample
+
+on:
+  push:
+    branches:
+      - reference-style-animation
+    paths:
+      - ".github/workflows/render-fresh-sample.yml"
+      - "scripts/render_video.py"
+      - "scripts/generate_scene_images.py"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  render:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Install renderer dependencies
+        run: python -m pip install --disable-pip-version-check pillow imageio-ffmpeg
+      - name: Create sample narration and voice track
+        run: |
+          mkdir -p output
+          cat > output/narration.txt <<'EOF'
+          In the winter of 1916, a young messenger entered a crowded railway station. Soldiers hurried past the platforms while families searched the faces of arriving trains. A station master unfolded a telegram beneath a flickering lamp. Across the town, a teacher closed the classroom window as distant thunder rolled over the rooftops. Later that evening, the messenger reached a small house and placed a letter into the hands of a worried mother. For one quiet moment, the noise of the war seemed to disappear.
+          EOF
+          python - <<'PY'
+          import math, wave
+          from array import array
+          rate=24000
+          seconds=24
+          data=array("h")
+          for i in range(rate*seconds):
+              t=i/rate
+              fade=min(1.0,t/0.5,(seconds-t)/1.0)
+              value=0.012*(math.sin(2*math.pi*110*t)+0.35*math.sin(2*math.pi*165*t))*max(0.0,fade)
+              data.append(max(-32768,min(32767,int(value*32767))))
+          with wave.open("output/narration.wav","wb") as f:
+              f.setnchannels(1); f.setsampwidth(2); f.setframerate(rate); f.writeframes(data.tobytes())
+          PY
+      - name: Generate AI environment plates when Cloudflare credentials are configured
+        env:
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+        run: |
+          if [ -n "$CLOUDFLARE_ACCOUNT_ID" ] && [ -n "$CLOUDFLARE_API_TOKEN" ]; then
+            rm -rf output/scenes && mkdir -p output/scenes
+            python scripts/generate_scene_images.py --narration output/narration.txt --output-dir output/scenes --max-images 10 --seed "$GITHUB_RUN_ID"
+          else
+            echo "Cloudflare credentials absent; use procedural illustrated environments."
+          fi
+      - name: Render fresh MP4 sample
+        run: python scripts/render_video.py --narration output/narration.txt --voice output/narration.wav --output output/stickmotion-fresh-sample.mp4
+      - name: Upload sample
+        uses: actions/upload-artifact@v4
+        with:
+          name: stickmotion-fresh-visual-sample
+          path: |
+            output/stickmotion-fresh-sample.mp4
+            output/stickmotion-fresh-sample.srt
+            output/stickmotion-fresh-sample.json
+            output/narration.txt
+            output/scenes/*.png
+          retention-days: 3

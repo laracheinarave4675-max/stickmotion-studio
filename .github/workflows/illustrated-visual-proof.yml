@@ -1,0 +1,69 @@
+name: Build illustrated visual proof
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  render-visual-proof:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install renderer dependency
+        run: python -m pip install --disable-pip-version-check pillow imageio-ffmpeg
+      - name: Create sample narration and test audio track
+        run: |
+          mkdir -p output
+          cat > output/narration.txt <<'EOF'
+          In the winter of 1916, a young soldier arrived at the front line. The streets behind him were crowded with frightened families, while officers read the latest orders to the men.
+          Inside a cold classroom, children tried to continue their lessons as the distant guns shook the windows. At home, a mother sat beside the piano, waiting for news that might never come.
+          By nightfall, the village had changed. The soldiers marched past darkened houses, carrying letters and memories of the lives they had left behind.
+          EOF
+          python - <<'PY'
+          import math, wave
+          from array import array
+          rate=24000
+          seconds=18
+          data=array("h")
+          for i in range(rate*seconds):
+              t=i/rate
+              fade=min(1.0,t/0.4,(seconds-t)/0.8)
+              value=0.018*math.sin(2*math.pi*110*t)*max(0.0,fade)
+              data.append(int(value*32767))
+          with wave.open("output/narration.wav","wb") as f:
+              f.setnchannels(1); f.setsampwidth(2); f.setframerate(rate); f.writeframes(data.tobytes())
+          PY
+      - name: Generate AI scene artwork when Cloudflare free-tier credentials are configured
+        env:
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+        run: |
+          if [ -n "$CLOUDFLARE_ACCOUNT_ID" ] && [ -n "$CLOUDFLARE_API_TOKEN" ]; then
+            python scripts/generate_scene_images.py --narration output/narration.txt --output-dir output/scenes --max-images 10
+          else
+            echo "Cloudflare image secrets not configured; renderer will use its local illustrated fallback."
+          fi
+      - name: Render illustrated MP4
+        run: python scripts/render_video.py --narration output/narration.txt --voice output/narration.wav --output output/illustrated-visual-proof.mp4
+      - name: Upload visual proof
+        uses: actions/upload-artifact@v4
+        with:
+          name: stickmotion-illustrated-visual-proof
+          path: |
+            output/illustrated-visual-proof.mp4
+            output/illustrated-visual-proof.srt
+            output/illustrated-visual-proof.json
+            output/narration.wav
+            output/narration.txt
+            output/scenes/*.png
+          retention-days: 3

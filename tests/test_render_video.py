@@ -2,6 +2,7 @@ import importlib.util
 import tempfile
 import unittest
 import wave
+from PIL import ImageChops
 from pathlib import Path
 
 ROOT = Path(__file__).parents[1]
@@ -24,8 +25,44 @@ class RendererTests(unittest.TestCase):
         for key in ("narration", "title", "visual", "action", "mood", "props"):
             self.assertIn(key, scene)
         frame = MODULE.draw_scene(scene, 0, 0.5, 5.0, scene["narration"])
-        self.assertEqual(frame.size, (1920, 1080))
+        self.assertEqual(frame.size, (960, 540))
         self.assertEqual(frame.mode, "RGB")
+
+    def test_illustrated_scene_uses_distinct_camera_framing(self):
+        scene = MODULE.load_scenes("The detective examined the evidence folder in the investigation room.")[0]
+        wide = MODULE.draw_scene(scene, 3, 0.5, 5.0, "")
+        close = MODULE.draw_scene(scene, 1, 0.5, 5.0, "")
+        self.assertEqual(wide.size, (960, 540))
+        self.assertIsNotNone(ImageChops.difference(wide, close).getbbox())
+
+    def test_close_up_contains_visible_face_details(self):
+        scene = MODULE.load_scenes("The detective examined the evidence folder in the investigation room.")[0]
+        frame = MODULE.draw_scene(scene, 1, 0.5, 5.0, "")
+        face_region = frame.crop((330, 80, 630, 390))
+        dark_pixels = sum(1 for pixel in face_region.getdata() if max(pixel) < 75)
+        self.assertGreater(dark_pixels, 80)
+
+    def test_character_animation_changes_pose_over_time(self):
+        scene = MODULE.load_scenes("The officer explained the plan to the frightened soldier.")[0]
+        scene["action"] = "speaking or arguing"
+        first = MODULE.draw_scene(scene, 1, 0.1, 5.0, "")
+        later = MODULE.draw_scene(scene, 1, 0.8, 5.0, "")
+        self.assertIsNotNone(ImageChops.difference(first, later).getbbox())
+
+    def test_ai_background_plates_receive_independently_animated_characters(self):
+        scene = MODULE.load_scenes("The officer explained the plan to the frightened soldier.")[0]
+        scene["action"] = "speaking or arguing"
+        plate = MODULE.Image.new("RGB", (1024, 576), (110, 130, 145))
+        first = MODULE.draw_scene_image(plate, scene, 1, 0.1, "")
+        later = MODULE.draw_scene_image(plate, scene, 1, 0.8, "")
+        self.assertEqual(first.size, (960, 540))
+        self.assertIsNotNone(ImageChops.difference(first, later).getbbox())
+
+    def test_renderer_exposes_reference_style_features(self):
+        scene = MODULE.load_scenes("The soldiers marched through the old city during the war.")[0]
+        frame = MODULE.draw_scene(scene, 1, 1.0, 5.0, scene["narration"])
+        self.assertEqual(frame.mode, "RGB")
+        self.assertGreater(len(set(frame.resize((96, 54)).getdata())), 30)
 
     def test_long_caption_is_paginated_not_discarded(self):
         text = " ".join(["A very important detail appears in the scene."] * 12)

@@ -1,0 +1,32 @@
+name: Reference renderer tests
+
+on:
+  push:
+    branches: [reference-style-animation]
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install renderer dependency
+        run: python -m pip install --disable-pip-version-check pillow
+      - name: JavaScript checks
+        run: npm run check && npm test
+      - name: Python syntax checks
+        run: python -m py_compile scripts/generate_voice.py scripts/generate_gemini_voice.py scripts/render_video.py scripts/generate_music.py scripts/generate_sfx.py scripts/generate_scene_images.py tests/test_render_video.py tests/test_scene_images.py
+      - name: Renderer and audio unit tests
+        run: |
+          python tests/test_generate_voice.py
+          python tests/test_generate_gemini_voice.py
+          python tests/test_render_video.py
+          python tests/test_scene_images.py

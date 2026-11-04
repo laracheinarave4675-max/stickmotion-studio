@@ -168,3 +168,101 @@ Never confuse a successful static-site deployment with a finished video generato
 - The separate Pages/CI run `41736998951` passed JavaScript syntax checks and all 13 Node tests, then failed at Python compilation because `tests/test_render_video.py` contained literal escaped newline sequences between the music and SFX imports.
 - Fixed those separators as real source newlines in commit `6ee782a6a5c8e04a9a4ab002ddc08e6ace8b1628`. CI for this fix must still be checked; do not mark the full CI green until then.
 - Next: user downloads and uploads the MP4 from the successful pilot artifact for frame-by-frame, audio, subtitle and pacing review; independently verify the CI run triggered by the test fix.
+
+
+## 2026-11-04 — reference style approved; visual redesign direction recorded
+- User supplied visual examples from two historical story-animation videos and explicitly approved them as the target for StickMotion Studio.
+- The target is a directed illustrated 2D story documentary: expressive varied characters with clothes and face acting; complete story-specific locations and props; deliberate wide/medium/close-up shot grammar; atmospheric color/light; continuity; and purposeful camera/editing rhythm.
+- The current procedural renderer (single generic figure, simplified background primitives, limited action loops) is not considered close enough to the target. A successful CI/MP4 export is not a quality milestone.
+- Added `docs/REFERENCE_ANIMATION_DIRECTION.md` on branch `reference-style-animation` with the approved art direction, pipeline principles, quality gates, and hybrid illustrated-scene strategy.
+- Next engineering step: inspect the existing renderer and replace the generic composition in bounded stages—first a character/environment asset-composition layer and shot-framing controls, then a short pilot to inspect. If primitive drawing cannot meet the style, change scene construction instead of adding cosmetic effects.
+- Quality gate: user must review the actual rendered video and approve the visual result before scaling to long runtime. No claim of target-level quality is made yet.
+
+
+## 2026-11-04 — first illustrated-scene renderer implementation
+- Replaced the single primitive stick-person frame with a lightweight illustrated 2D scene renderer in `scripts/render_video.py`.
+- New renderer composes location-specific streets/interiors, period-like building facades, room architecture, furniture, landscape layers, varied clothed character silhouettes, hair/headwear variants, facial expressions, hand gestures, scene props, crowd/supporting characters, wide/medium/close framing, subtle camera drift/zoom, and a restrained vignette.
+- Kept the existing bounded MP4, voice, SRT, music and SFX pipeline and the 90-second cap. This is a procedural illustrated renderer, not yet frame-by-frame character animation or AI-generated artwork; it is an intermediate engineering step toward the approved references.
+- Fixed subtitle compositing so captions are drawn onto the final processed frame.
+- Expanded `tests/test_render_video.py` to check distinct camera framing and minimum visual complexity.
+- Added `.github/workflows/reference-renderer-tests.yml` to run JavaScript and Python checks on this branch and pull requests.
+- Commits on `reference-style-animation`: renderer replacement `9de555c`, subtitle overlay fix `ca73c1e`, supporting cast/vignette `beffb68`, visual tests `ad1db91`, renderer CI `2ffc001`.
+- Validation is pending GitHub Actions. Do not treat the renderer as validated until CI passes and a new MP4 is rendered and visually reviewed.
+- Next: resolve any CI failures, then render a fresh short pilot using the same Charon/MP4 workflow and inspect actual output. If procedural art still falls short, move to reusable authored/generated illustrated assets and rigged animation rather than polishing generic vector figures.
+
+
+## 2026-11-04 — first CI failure diagnosed and corrected
+- The new reference-renderer workflow successfully ran JS syntax checks, all 13 Node tests, Python compilation, 4 voice tests, and 5 Gemini voice tests. The renderer-specific framing/visual-complexity tests also passed.
+- One existing SFX test exposed an event-priority bug: the word "hit" in "waves hit the raft" was classified as a generic impact before the water cue. Removed the overly broad generic "hit" token from the impact matcher; explicit collision terms remain.
+- Fix commit: `346a134d905f4acc924627055129d4adca06f491`. Awaiting rerun of the full workflow.
+
+
+## 2026-11-04 — automatic visual proof render added
+- Added `.github/workflows/illustrated-visual-proof.yml`: on updates to the reference branch it creates a short English historical-story narration, synthesizes a temporary open-source espeak-ng voice, renders the actual 1080p MP4 through the new illustrated renderer, and uploads MP4/SRT/metadata as a 3-day artifact.
+- This proof is for visual pipeline validation only; espeak-ng is not the chosen production narrator. The Charon/Gemini workflow remains the intended voice path.
+- Awaiting the first complete rendered artifact and inspection of its frames/metadata before claiming the new visual approach works end-to-end.
+
+
+## 2026-11-04 — visual proof workflow made deterministic
+- Removed the package-manager dependency from the visual proof workflow after the hosted runner spent excessive time in apt installation.
+- The proof now uses the runner's FFmpeg and a small deterministic mono test track generated in Python. It validates frame composition, MP4 encoding, scene sequencing and subtitles; it is explicitly not a voice-quality or final audio-mix test.
+- Renderer metadata now describes its audio input generically as a supplied mono narration WAV.
+
+
+## 2026-11-04 — portable FFmpeg resolution
+- The first proof render exposed that FFmpeg is not present on the runner image and the previous apt-based setup was not reliable.
+- Renderer now resolves FFmpeg from PATH or falls back to the bundled executable supplied by `imageio-ffmpeg`.
+- Both visual-proof and manual Charon pilot workflows now install `imageio-ffmpeg` through pip rather than relying on apt mirrors.
+- Awaiting a fresh proof render with the bundled encoder.
+
+
+## 2026-11-04 — first actual visual proof inspected; composition corrections
+- The 18-second MP4 rendered successfully at 1920×1080, 30 fps, H.264/AAC. Artifact run `41789802960`, artifact `stickmotion-illustrated-visual-proof` (3.54 MB; expires 2026-11-07).
+- Frame inspection exposed a real visual defect: character scale was too small and subtitle panel obscured much of the lower body; several narration beats fell into a generic empty room.
+- Corrected character proportions and shot scales (wide/medium/close), moved subtitle panel down, and added explicit classroom, home/piano, and village environment categories with dedicated scene dressing. Expanded planner tests for those categories.
+- This fixes the specific issues visible in the first proof, but a new proof render is required to verify the improved composition.
+
+
+## 2026-11-04 — stronger emotional close-up framing
+- Increased close-up shot scale and switched the character rig to its enlarged head/face proportions for close-up beats; village establishing shots also include a background crowd.
+- This follows inspection of the first proof, where the supposed close-up was still too distant.
+- New proof run is required to validate these latest framing changes.
+
+
+## 2026-11-04 — render throughput optimization
+- Kept the internal illustration canvas at 960×540 and moved the final upscale to 1920×1080 into FFmpeg. This preserves the 1080p delivery dimensions while reducing raw frame-pipe traffic by 75% and avoiding a redundant full-size Pillow resize per frame.
+- Updated renderer tests to assert the internal drawing surface dimensions; MP4 output metadata remains 1920×1080 at 30 fps.
+- New proof run will validate this faster path together with the latest classroom/home/village and enlarged close-up changes.
+
+
+## 2026-11-04 — close-up coordinate bug fixed
+- Inspection of the second proof showed that the enlarged close-up rig placed its head outside the frame because the body-height offsets were not multiplied by camera scale.
+- Corrected the scaled torso, head-centre and button coordinates; added a regression test that checks the close-up frame contains visible facial detail.
+- This was a renderer geometry bug, not an art-direction issue. A new proof is required after the fix.
+
+
+## 2026-11-04 — AI-generated scene artwork pipeline added
+- Added `scripts/generate_scene_images.py` using Cloudflare Workers AI FLUX.2 Klein 4B. It converts each planned narration beat into a bespoke 1024×576 illustrated scene plate, uses the first generated frame as a small visual reference for later scenes, supports resumable existing files, bounded image counts and retries.
+- Added an AI-scene rendering path in `scripts/render_video.py`: each generated plate receives gentle Ken Burns camera movement, scene-appropriate atmospheric motion and a short dissolve at cuts. If no generated plate exists, the local illustrated renderer remains the fallback.
+- Added optional Cloudflare scene generation to both the automatic visual-proof workflow and the Charon MP4 pilot. No token is stored in source; the optional secrets are `CLOUDFLARE_ACCOUNT_ID` and `CLOUDFLARE_API_TOKEN`.
+- Updated CI with prompt/multipart tests and README with Cloudflare setup and free-tier limits.
+- Cloudflare official pricing currently lists 10,000 Workers AI Neurons/day on the Free Workers plan; this is a bounded daily allowance, not unlimited. The optional image path requires a Cloudflare API token with Workers AI permissions. See Cloudflare pricing/model docs in the README.
+- Important boundary: AI scene plates are still illustrations with camera movement/dissolves, not full frame-by-frame character rig animation. A new pilot with the Cloudflare secrets configured is needed to inspect the generated art quality and continuity.
+
+
+## 2026-11-04 — proof after geometry and AI pipeline integration
+- Latest automatic visual proof completed successfully on commit `7ece2889074d7b21259e8cfe3e240addd75ce8eb`, run `41791048561`. MP4: 18 seconds, H.264/AAC, 1920×1080, 30 fps.
+- Metadata confirms `ai_generated_scene_count: 0`: the Cloudflare credentials are not configured in this repository, so the successful proof used the procedural fallback. The AI image generation script is unit-tested, but its live API path has not yet been exercised.
+- The close-up rig now renders a real enlarged face; classroom and home/piano sets are present. The procedural result remains visibly simpler than the user's reference videos and is not the final visual target.
+- Renderer/AI-scene CI passed, including prompt, multipart-reference, scene-classification, close-up-face and audio tests.
+- Next required action for the intended art quality: add repository Actions secrets `CLOUDFLARE_ACCOUNT_ID` and `CLOUDFLARE_API_TOKEN` (Workers AI Read + Edit permissions), then rerun the visual proof. This enables FLUX.2 Klein 4B scene artwork under Cloudflare's daily free allocation. Do not claim AI artwork has been generated until a later artifact reports a nonzero AI scene count.
+
+
+## 2026-11-04 — preserve Actions quota
+- Removed automatic push-triggered full visual renders; the 18-second proof workflow is now manual-only because repeated commits were launching redundant MP4 jobs.
+- Renderer CI now runs once per push to the working branch (not again for each draft-PR synchronization). This avoids unnecessary GitHub Actions usage while keeping checks active.
+
+
+## 2026-11-04 — final branch CI verification
+- Latest renderer test run `41791226951` on the current workflow configuration completed all main steps successfully: JS checks, 13 Node tests, Python compilation, voice tests, renderer tests, close-up face regression, and AI scene prompt/multipart tests.
+- Current working branch: `reference-style-animation`; draft PR: #1. Full AI-art validation remains blocked only on adding the two Cloudflare repository secrets and rerunning the manual visual proof.
