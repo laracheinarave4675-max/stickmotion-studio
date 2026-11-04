@@ -288,9 +288,9 @@ def draw_scene(scene,index,t,duration,caption):
     # Supporting cast turns a single-person pose into a staged story beat.
     if shot==1 and (visual in ("conversation","investigation","crime","historical","war") or action in ("speaking or arguing","helping or rescuing","reaching or handing over")):
         partner_x=min(850,cx+245)
-        draw_character(d,partner_x,base,scale*.78,t+1.1,"observing or explaining","worried" if mood=="worried" else "thinking",index+3)
+        draw_character(d,partner_x,base,scale*.78,t+1.1,"observing or explaining","worried" if mood=="worried" else "thinking",3)
     # main character
-    draw_character(d,cx,base,scale,t,action,mood,index,close=(shot==3))
+    draw_character(d,cx,base,scale,t,action,mood,0,close=(shot==3))
     props=scene.get("props",[])
     if props and shot!=3:
         px=min(850,cx+105*scale); py=base-150*scale
@@ -364,8 +364,8 @@ def draw_scene_image(plate, scene, index, t, caption):
                  or action in ("speaking or arguing","helping or rescuing","reaching or handing over"))
     if shot==1 and interactive:
         draw_character(d,min(850,cx+260),base,scale*.76,t+1.1,"observing or explaining",
-                       "worried" if mood=="worried" else "thinking",index+3)
-    draw_character(d,cx,base,scale,t,action,mood,index,close=(shot==2))
+                       "worried" if mood=="worried" else "thinking",3)
+    draw_character(d,cx,base,scale,t,action,mood,0,close=(shot==2))
     props=scene.get("props",[])
     if props and shot!=2:
         draw_prop(d,props[0],min(875,cx+115*scale),base-145*scale,(31,30,29))
