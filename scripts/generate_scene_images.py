@@ -19,7 +19,7 @@ STYLE = (
     "Not a stick-figure diagram, not geometric clipart, not photorealistic, not 3D. "
     "No lettering, no subtitles, no logos, no watermark, no borders."
 )
-NEGATIVE = "text, typography, subtitles, captions, logo, watermark, photorealism, 3D render, empty background, crude stick figures, malformed hands, extra limbs, gore"
+NEGATIVE = "text, typography, subtitles, captions, logo, watermark, photorealism, 3D render, empty background, crude stick figures, malformed hands, extra limbs, gore, extreme close-up, giant head, oversized face, floating head, cropped body, duplicate protagonist, collage, split screen"
 def load_scenes(text: str):
     js = "import {buildScenePlan} from './src/scene-planner.js'; console.log(JSON.stringify(buildScenePlan(" + json.dumps(text) + ")));"
     return json.loads(subprocess.run(["node", "--input-type=module", "-e", js], check=True, capture_output=True, text=True).stdout)
@@ -37,8 +37,8 @@ def make_prompt(scene: dict, index: int, total: int, protagonist: str) -> str:
         f"Emotion: {scene.get('mood','explaining')}. Important props: {props}. "
         f"Camera direction: {camera}.\n"
         f"Depict this exact narration beat as a clear visual story moment: {narration}\n"
-        "Make the people and environment fill the frame naturally. Prioritize story clarity, expressive faces, "
-        "historical plausibility, layered background details and strong cinematic composition. "
+        "Compose a balanced cinematic story frame: show the complete environment and keep each main character at a natural human scale, normally 25–45% of frame height. Prefer wide or medium-wide full-body staging; use a medium shot only when the narration is emotionally intimate. Never use extreme close-ups, giant floating heads, oversized faces, cropped limbs, duplicated people, or characters filling the entire frame. Keep clear separation between foreground characters, props, and background architecture. Prioritize story clarity, expressive faces, "
+        "historical plausibility, layered foreground/midground/background details, perspective, rich set dressing, and strong cinematic composition. Keep all important characters fully inside the frame with breathing room around their heads and bodies. "
         "If a reference image is supplied, use it to maintain the same illustration style and protagonist design, "
         "but create a genuinely new location, pose, action and camera composition."
     )[:2048]
