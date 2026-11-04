@@ -261,3 +261,8 @@ Never confuse a successful static-site deployment with a finished video generato
 ## 2026-11-04 — preserve Actions quota
 - Removed automatic push-triggered full visual renders; the 18-second proof workflow is now manual-only because repeated commits were launching redundant MP4 jobs.
 - Renderer CI now runs once per push to the working branch (not again for each draft-PR synchronization). This avoids unnecessary GitHub Actions usage while keeping checks active.
+
+
+## 2026-11-04 — final branch CI verification
+- Latest renderer test run `41791226951` on the current workflow configuration completed all main steps successfully: JS checks, 13 Node tests, Python compilation, voice tests, renderer tests, close-up face regression, and AI scene prompt/multipart tests.
+- Current working branch: `reference-style-animation`; draft PR: #1. Full AI-art validation remains blocked only on adding the two Cloudflare repository secrets and rerunning the manual visual proof.
