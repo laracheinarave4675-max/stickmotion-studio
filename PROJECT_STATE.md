@@ -214,3 +214,10 @@ Never confuse a successful static-site deployment with a finished video generato
 - Renderer now resolves FFmpeg from PATH or falls back to the bundled executable supplied by `imageio-ffmpeg`.
 - Both visual-proof and manual Charon pilot workflows now install `imageio-ffmpeg` through pip rather than relying on apt mirrors.
 - Awaiting a fresh proof render with the bundled encoder.
+
+
+## 2026-11-04 — first actual visual proof inspected; composition corrections
+- The 18-second MP4 rendered successfully at 1920×1080, 30 fps, H.264/AAC. Artifact run `41789802960`, artifact `stickmotion-illustrated-visual-proof` (3.54 MB; expires 2026-11-07).
+- Frame inspection exposed a real visual defect: character scale was too small and subtitle panel obscured much of the lower body; several narration beats fell into a generic empty room.
+- Corrected character proportions and shot scales (wide/medium/close), moved subtitle panel down, and added explicit classroom, home/piano, and village environment categories with dedicated scene dressing. Expanded planner tests for those categories.
+- This fixes the specific issues visible in the first proof, but a new proof render is required to verify the improved composition.
