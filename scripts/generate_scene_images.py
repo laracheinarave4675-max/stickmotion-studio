@@ -27,20 +27,30 @@ def make_prompt(scene: dict, index: int, total: int, protagonist: str) -> str:
     narration = " ".join(scene.get("narration", "").split())
     camera = scene.get("camera", "cinematic medium shot")
     return (
-        f"{STYLE}\n"
-        "Create a background environment plate only. Do not draw any people, humans, faces, bodies, "
-        "crowds, silhouettes, or character-like figures; animated characters will be composited as "
-        "separate moving layers by the renderer. Keep the central foreground readable and leave "
-        "natural floor space for characters.\n"
+        f"{STYLE}\\n"
+        "Create one complete, cohesive 2D story-cartoon frame with the people INCLUDED in the illustration. "
+        "Show the actual human action from the narration: recognizable expressive illustrated people with "
+        "consistent anatomy, clean connected limbs, natural hands, readable faces, distinctive hair and "
+        "period-appropriate clothing. The main protagonist must retain the same face, hair, age, body shape "
+        "and outfit as the supplied reference image; supporting people must look different from one another. "
+        "Do not create stick figures, wireframe bodies, detached limbs, duplicate faces, extra arms, "
+        "floating heads, or disconnected outlines.\\n"
         f"Scene {index + 1} of {total}. Setting: {scene.get('setting','specific story location')}. "
-        f"Visual category: {scene.get('visual','historical')}. Action: {scene.get('action','observing or explaining')}. "
-        f"Emotion: {scene.get('mood','explaining')}. Important props: {props}. "
-        f"Camera direction: {camera}.\n"
-        f"Depict this exact narration beat as a clear visual story moment: {narration}\n"
-        "Compose a balanced cinematic story frame: show the complete environment and keep each main character at a natural human scale, normally 25–45% of frame height. Prefer wide or medium-wide full-body staging; use a medium shot only when the narration is emotionally intimate. Never use extreme close-ups, giant floating heads, oversized faces, cropped limbs, duplicated people, or characters filling the entire frame. Keep clear separation between foreground characters, props, and background architecture. Prioritize story clarity, expressive faces, "
-        "historical plausibility, layered foreground/midground/background details, perspective, rich set dressing, and strong cinematic composition. Keep all important characters fully inside the frame with breathing room around their heads and bodies. "
-        "If a reference image is supplied, use it only to maintain the same illustration style, "
-        "palette, line weight and lighting while creating a genuinely new location and camera composition."
+        f"Visual category: {scene.get('visual','historical')}. Action to visibly depict: {scene.get('action','observing or explaining')}. "
+        f"Emotion and facial acting: {scene.get('mood','explaining')}. Important props: {props}. "
+        f"Directed camera composition: {camera}.\\n"
+        f"Tell this exact narration beat in a single readable visual moment: {narration}\\n"
+        "Art direction: premium hand-drawn 2D animated historical documentary, expressive character design, "
+        "confident varied black ink linework, appealing proportions, carefully drawn clothing folds, "
+        "subtle painted shadows, rich layered backgrounds with believable perspective, detailed architecture, "
+        "furniture and story props, cinematic warm/cool lighting, controlled vintage palette, tactile painted "
+        "background texture. This should look like a polished frame from a professionally art-directed "
+        "animated documentary, not generic AI clipart. "
+        "Vary the camera composition between scenes: wide establishing views with small figures, medium "
+        "two-shots for interactions, over-the-shoulder action views, and emotional close-ups only when "
+        "the narration calls for them. Keep faces and bodies anatomically coherent and fully composed. "
+        "Use the reference image to preserve protagonist identity and the exact drawing style, but invent "
+        "a new location, action, staging and camera angle for this scene."
     )[:2048]
 def multipart(fields: dict[str, str], files: dict[str, tuple[str, bytes, str]]) -> tuple[bytes, str]:
     boundary = "----StickMotion" + uuid.uuid4().hex
@@ -100,7 +110,7 @@ def main():
     p.add_argument("--output-dir", type=Path, default=Path("output/scenes"))
     p.add_argument("--max-images", type=int, default=70)
     p.add_argument("--seed", type=int, default=1916)
-    p.add_argument("--protagonist", default="the main person established in the first scene; preserve their visual identity")
+    p.add_argument("--protagonist", default="the same lead character as the supplied first-scene reference")
     p.add_argument("--delay", type=float, default=1.0)
     a = p.parse_args()
     account = os.environ.get("CLOUDFLARE_ACCOUNT_ID", "").strip()
