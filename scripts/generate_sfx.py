@@ -35,7 +35,7 @@ def cue(kind, seconds=1.0, seed=1):
     return out
 def choose(narration, visual, action):
     text=narration.lower()
-    if re.search(r'\b(explosion|explode|bomb|crash|impact|collapse|fell|fall|struck|hit)\b',text): return "impact"
+    if re.search(r'\b(explosion|explode|bomb|crash|impact|collapse|fell|fall|struck)\b',text): return "impact"
     if re.search(r'\b(opened|unlock|door|gate|key|locked)\b',text): return "door" if "door" in text or "gate" in text else "keys"
     if re.search(r'\b(waves|ocean|sea|water|ship|raft|drown|sinking)\b',text) or visual=="shipwreck": return "water"
     if re.search(r'\b(wind|storm|desert|blizzard|cold|night|darkness)\b',text) or visual in ("desert","wilderness","night"): return "wind"
