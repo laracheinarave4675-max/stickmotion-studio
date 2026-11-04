@@ -189,3 +189,9 @@ Never confuse a successful static-site deployment with a finished video generato
 - Commits on `reference-style-animation`: renderer replacement `9de555c`, subtitle overlay fix `ca73c1e`, supporting cast/vignette `beffb68`, visual tests `ad1db91`, renderer CI `2ffc001`.
 - Validation is pending GitHub Actions. Do not treat the renderer as validated until CI passes and a new MP4 is rendered and visually reviewed.
 - Next: resolve any CI failures, then render a fresh short pilot using the same Charon/MP4 workflow and inspect actual output. If procedural art still falls short, move to reusable authored/generated illustrated assets and rigged animation rather than polishing generic vector figures.
+
+
+## 2026-11-04 — first CI failure diagnosed and corrected
+- The new reference-renderer workflow successfully ran JS syntax checks, all 13 Node tests, Python compilation, 4 voice tests, and 5 Gemini voice tests. The renderer-specific framing/visual-complexity tests also passed.
+- One existing SFX test exposed an event-priority bug: the word "hit" in "waves hit the raft" was classified as a generic impact before the water cue. Removed the overly broad generic "hit" token from the impact matcher; explicit collision terms remain.
+- Fix commit: `346a134d905f4acc924627055129d4adca06f491`. Awaiting rerun of the full workflow.
