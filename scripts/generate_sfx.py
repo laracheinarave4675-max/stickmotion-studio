@@ -57,6 +57,11 @@ def cue(kind, seconds=1.0, seed=1):
     return out
 def choose(narration, visual, action):
     text=narration.lower()
+    if re.search(r'\b(train|railway|locomotive|station|platform|tracks)\b',text): return "train"
+    if re.search(r'\b(letter|paper|document|note|envelope|page|read|reading)\b',text): return "paper"
+    if re.search(r'\b(whistle|steam)\b',text): return "whistle"
+    if re.search(r'\b(artillery|shelling|cannon|gunfire|rifle fire)\b',text): return "artillery"
+    if re.search(r'\b(crowd|crowded|people shouting|market)\b',text): return "crowd"
     if re.search(r'\b(explosion|explode|bomb|crash|impact|collapse|fell|fall|struck)\b',text): return "impact"
     if re.search(r'\b(opened|unlock|door|gate|key|locked)\b',text): return "door" if "door" in text or "gate" in text else "keys"
     if re.search(r'\b(waves|ocean|sea|water|ship|raft|drown|sinking)\b',text) or visual=="shipwreck": return "water"
