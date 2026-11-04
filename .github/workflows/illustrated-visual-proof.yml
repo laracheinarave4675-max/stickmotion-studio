@@ -21,12 +21,9 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-      - name: Install free rendering tools
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y ffmpeg espeak-ng
-          python -m pip install --disable-pip-version-check pillow
-      - name: Create short sample narration and voice
+      - name: Install renderer dependency
+        run: python -m pip install --disable-pip-version-check pillow
+      - name: Create sample narration and test audio track
         run: |
           mkdir -p output
           cat > output/narration.txt <<'EOF'
@@ -34,7 +31,21 @@ jobs:
           Inside a cold classroom, children tried to continue their lessons as the distant guns shook the windows. At home, a mother sat beside the piano, waiting for news that might never come.
           By nightfall, the village had changed. The soldiers marched past darkened houses, carrying letters and memories of the lives they had left behind.
           EOF
-          espeak-ng -v en-us+m3 -s 145 -a 155 -w output/narration.wav -f output/narration.txt
+          python - <<'PY'
+          import math, wave
+          from array import array
+          rate=24000
+          seconds=18
+          data=array("h")
+          for i in range(rate*seconds):
+              t=i/rate
+              fade=min(1.0,t/0.4,(seconds-t)/0.8)
+              value=0.018*math.sin(2*math.pi*110*t)*max(0.0,fade)
+              data.append(int(value*32767))
+          with wave.open("output/narration.wav","wb") as f:
+              f.setnchannels(1); f.setsampwidth(2); f.setframerate(rate); f.writeframes(data.tobytes())
+          PY
+          ffmpeg -version | head -n 1
       - name: Render illustrated MP4
         run: python scripts/render_video.py --narration output/narration.txt --voice output/narration.wav --output output/illustrated-visual-proof.mp4
       - name: Upload visual proof
