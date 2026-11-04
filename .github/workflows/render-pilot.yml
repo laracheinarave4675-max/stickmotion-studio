@@ -56,6 +56,22 @@ jobs:
           VOICE: ${{ inputs.voice || 'Charon' }}
         run: |
           python scripts/generate_gemini_voice.py --input output/narration.txt --output output/narration.wav --voice "$VOICE" --style "Measured, warm, authoritative documentary narration. Natural pacing, clear articulation, restrained emotion. Avoid an exaggerated announcer style." --model gemini-2.5-flash-preview-tts
+      - name: Load approved Memorial de Verdun character reference when present
+        run: |
+          mkdir -p output/scenes assets/references
+          if [ -f assets/references/memorial-verdun.png ]; then
+            python - <<'PY'
+          from PIL import Image
+          Image.open("assets/references/memorial-verdun.png").convert("RGB").save("output/scenes/character-reference.jpg", "JPEG", quality=94)
+          PY
+          elif [ -f assets/references/memorial-verdun.jpg ]; then
+            python - <<'PY'
+          from PIL import Image
+          Image.open("assets/references/memorial-verdun.jpg").convert("RGB").save("output/scenes/character-reference.jpg", "JPEG", quality=94)
+          PY
+          else
+            echo "Approved Memorial de Verdun image is not in assets/references yet; using the generated lead-character crop for this pilot."
+          fi
       - name: Generate AI scene artwork when Cloudflare credentials are configured
         env:
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
