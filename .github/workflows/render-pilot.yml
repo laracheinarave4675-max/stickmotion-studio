@@ -50,6 +50,15 @@ jobs:
           Path("output").mkdir(exist_ok=True)
           Path("output/narration.txt").write_text(text,encoding="utf-8")
           PY
+      - name: Require configured AI services
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+        run: |
+          test -n "$GEMINI_API_KEY" || (echo "GEMINI_API_KEY is required; refusing to render a silent video." && exit 1)
+          test -n "$CLOUDFLARE_ACCOUNT_ID" || (echo "CLOUDFLARE_ACCOUNT_ID is required; refusing low-quality fallback artwork." && exit 1)
+          test -n "$CLOUDFLARE_API_TOKEN" || (echo "CLOUDFLARE_API_TOKEN is required; refusing low-quality fallback artwork." && exit 1)
       - name: Generate Charon narration
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
@@ -77,11 +86,7 @@ jobs:
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
         run: |
-          if [ -n "$CLOUDFLARE_ACCOUNT_ID" ] && [ -n "$CLOUDFLARE_API_TOKEN" ]; then
-            python scripts/generate_scene_images.py --narration output/narration.txt --output-dir output/scenes --max-images 30
-          else
-            echo "Cloudflare image secrets not configured; renderer will use its local illustrated fallback."
-          fi
+          python scripts/generate_scene_images.py --narration output/narration.txt --output-dir output/scenes --max-images 30
       - name: Render animated MP4 with subtitles
         run: python scripts/render_video.py --narration output/narration.txt --voice output/narration.wav --output output/stickmotion-pilot.mp4
       - name: Upload MP4, SRT and render metadata
