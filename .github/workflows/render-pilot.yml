@@ -34,9 +34,7 @@ jobs:
           node-version: 20
       - name: Install renderer dependencies
         run: |
-          sudo apt-get update
-          sudo apt-get install -y ffmpeg
-          python -m pip install --disable-pip-version-check pillow google-genai
+          python -m pip install --disable-pip-version-check pillow imageio-ffmpeg google-genai
       - name: Validate and save narration
         env:
           NARRATION: ${{ inputs.narration }}
