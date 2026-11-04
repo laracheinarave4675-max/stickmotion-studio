@@ -359,7 +359,7 @@ def draw_scene_image(plate, scene, index, t, caption):
     elif shot==1:
         cx,base,scale=SW*.39,478,1.02
     else:
-        cx,base,scale=SW*.50,625,1.38
+        cx,base,scale=SW*.50,515,1.30
     interactive=(visual in ("conversation","investigation","crime","historical","war","classroom","home")
                  or action in ("speaking or arguing","helping or rescuing","reaching or handing over"))
     if shot==1 and interactive:
