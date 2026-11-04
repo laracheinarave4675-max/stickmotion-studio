@@ -11,9 +11,8 @@ from PIL import Image
 MODEL = "@cf/black-forest-labs/flux-2-klein-4b"
 STYLE = (
     "Premium hand-drawn 2D animated documentary illustration, cinematic story-cartoon frame, "
-    "bold clean black ink outlines, expressive white round-headed human characters with readable "
-    "eyes eyebrows and mouth, simple appealing cartoon anatomy, distinct period clothing and hats, "
-    "rich fully illustrated environments with architecture furniture props and depth, painterly "
+    "bold clean black ink outlines, richly detailed locations, architecture, furniture, props, "
+    "and depth, painterly "
     "muted vintage colors, subtle paper grain, intentional warm/cool lighting, professional "
     "animation background art, carefully composed 16:9 widescreen shot. "
     "Not a stick-figure diagram, not geometric clipart, not photorealistic, not 3D. "
@@ -29,9 +28,10 @@ def make_prompt(scene: dict, index: int, total: int, protagonist: str) -> str:
     camera = scene.get("camera", "cinematic medium shot")
     return (
         f"{STYLE}\n"
-        f"Recurring protagonist continuity: {protagonist}. Keep this protagonist recognizable in every scene; "
-        "preserve the same face shape, hair, outfit colors and proportions when the character appears. "
-        "Supporting characters must look distinct from one another.\n"
+        "Create a background environment plate only. Do not draw any people, humans, faces, bodies, "
+        "crowds, silhouettes, or character-like figures; animated characters will be composited as "
+        "separate moving layers by the renderer. Keep the central foreground readable and leave "
+        "natural floor space for characters.\n"
         f"Scene {index + 1} of {total}. Setting: {scene.get('setting','specific story location')}. "
         f"Visual category: {scene.get('visual','historical')}. Action: {scene.get('action','observing or explaining')}. "
         f"Emotion: {scene.get('mood','explaining')}. Important props: {props}. "
@@ -39,8 +39,8 @@ def make_prompt(scene: dict, index: int, total: int, protagonist: str) -> str:
         f"Depict this exact narration beat as a clear visual story moment: {narration}\n"
         "Compose a balanced cinematic story frame: show the complete environment and keep each main character at a natural human scale, normally 25–45% of frame height. Prefer wide or medium-wide full-body staging; use a medium shot only when the narration is emotionally intimate. Never use extreme close-ups, giant floating heads, oversized faces, cropped limbs, duplicated people, or characters filling the entire frame. Keep clear separation between foreground characters, props, and background architecture. Prioritize story clarity, expressive faces, "
         "historical plausibility, layered foreground/midground/background details, perspective, rich set dressing, and strong cinematic composition. Keep all important characters fully inside the frame with breathing room around their heads and bodies. "
-        "If a reference image is supplied, use it to maintain the same illustration style and protagonist design, "
-        "but create a genuinely new location, pose, action and camera composition."
+        "If a reference image is supplied, use it only to maintain the same illustration style, "
+        "palette, line weight and lighting while creating a genuinely new location and camera composition."
     )[:2048]
 def multipart(fields: dict[str, str], files: dict[str, tuple[str, bytes, str]]) -> tuple[bytes, str]:
     boundary = "----StickMotion" + uuid.uuid4().hex
