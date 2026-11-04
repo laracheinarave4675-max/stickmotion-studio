@@ -23,6 +23,11 @@ class SceneImageTests(unittest.TestCase):
         self.assertIn("complete clothed bodies", prompt)
         self.assertIn("reads a letter", prompt)
         self.assertIn("never stick figures", prompt)
+        self.assertIn("Required composition variation", prompt)
+        self.assertIn("Do NOT copy its camera angle", prompt)
+        self.assertIn("no text, fake writing", prompt)
+        other = MODULE.make_prompt(scene, 1, 5, "young soldier in a navy uniform")
+        self.assertNotEqual(prompt, other)
         self.assertLessEqual(len(prompt), 3000)
 
     def test_multipart_request_encodes_reference_image(self):
