@@ -54,7 +54,7 @@ jobs:
         run: |
           if [ -n "$CLOUDFLARE_ACCOUNT_ID" ] && [ -n "$CLOUDFLARE_API_TOKEN" ]; then
             rm -rf output/scenes && mkdir -p output/scenes
-            python scripts/generate_scene_images.py --narration output/narration.txt --output-dir output/scenes --max-images 10 --seed 20261104 || echo "Cloudflare image generation unavailable; continuing with the procedural illustrated renderer."
+            python scripts/generate_scene_images.py --narration output/narration.txt --output-dir output/scenes --max-images 10 --seed "$GITHUB_RUN_ID"
           else
             echo "Cloudflare credentials absent; use procedural illustrated environments."
           fi
