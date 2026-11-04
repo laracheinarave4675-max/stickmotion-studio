@@ -18,6 +18,11 @@ test("recognizes specific survival environments before generic survival wording"
   assert.equal(classifyScene("A sailor survived a shipwreck in the ocean.").visual, "shipwreck");
   assert.equal(classifyScene("A wolf followed him through the forest.").visual, "wilderness");
 });
+test("recognizes classroom, home and village story settings", () => {
+  assert.equal(classifyScene("Children sat in the classroom while their teacher read the lesson.").visual, "classroom");
+  assert.equal(classifyScene("At home, his mother waited beside the piano.").visual, "home");
+  assert.equal(classifyScene("The soldiers marched through the village streets.").visual, "village");
+});
 test("recognizes war, disaster and prison", () => {
   assert.equal(classifyScene("The soldiers prepared for battle.").visual, "war");
   assert.equal(classifyScene("An earthquake destroyed the town.").visual, "disaster");
