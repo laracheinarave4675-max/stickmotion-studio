@@ -22,7 +22,7 @@ class SceneImageTests(unittest.TestCase):
         self.assertIn("classic stick figure", prompt)
         self.assertIn("NO human body", prompt)
         self.assertIn("reads a letter", prompt)
-        self.assertIn("3D environments", prompt)
+        self.assertIn("3D environment", prompt)
         self.assertLessEqual(len(prompt), 2048)
 
     def test_multipart_request_encodes_reference_image(self):
