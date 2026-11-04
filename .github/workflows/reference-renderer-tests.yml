@@ -25,9 +25,10 @@ jobs:
       - name: JavaScript checks
         run: npm run check && npm test
       - name: Python syntax checks
-        run: python -m py_compile scripts/generate_voice.py scripts/generate_gemini_voice.py scripts/render_video.py scripts/generate_music.py scripts/generate_sfx.py tests/test_render_video.py
+        run: python -m py_compile scripts/generate_voice.py scripts/generate_gemini_voice.py scripts/render_video.py scripts/generate_music.py scripts/generate_sfx.py scripts/generate_scene_images.py tests/test_render_video.py tests/test_scene_images.py
       - name: Renderer and audio unit tests
         run: |
           python tests/test_generate_voice.py
           python tests/test_generate_gemini_voice.py
           python tests/test_render_video.py
+          python tests/test_scene_images.py
