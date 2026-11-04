@@ -41,7 +41,7 @@ def make_prompt(scene: dict, index: int, total: int, protagonist: str) -> str:
     ]
     shot = shot_patterns[index % len(shot_patterns)]
     return (
-        f"{STYLE}\\n"
+        f"{STYLE}\n"
         f"Create a single coherent illustrated frame for scene {index + 1} of {total}. "
         "Show actual illustrated people, not symbols or stick figures. "
         "Character design: rounded expressive faces, visible eyes and eyebrows, clear mouth expression, "
