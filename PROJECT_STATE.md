@@ -195,3 +195,9 @@ Never confuse a successful static-site deployment with a finished video generato
 - The new reference-renderer workflow successfully ran JS syntax checks, all 13 Node tests, Python compilation, 4 voice tests, and 5 Gemini voice tests. The renderer-specific framing/visual-complexity tests also passed.
 - One existing SFX test exposed an event-priority bug: the word "hit" in "waves hit the raft" was classified as a generic impact before the water cue. Removed the overly broad generic "hit" token from the impact matcher; explicit collision terms remain.
 - Fix commit: `346a134d905f4acc924627055129d4adca06f491`. Awaiting rerun of the full workflow.
+
+
+## 2026-11-04 — automatic visual proof render added
+- Added `.github/workflows/illustrated-visual-proof.yml`: on updates to the reference branch it creates a short English historical-story narration, synthesizes a temporary open-source espeak-ng voice, renders the actual 1080p MP4 through the new illustrated renderer, and uploads MP4/SRT/metadata as a 3-day artifact.
+- This proof is for visual pipeline validation only; espeak-ng is not the chosen production narrator. The Charon/Gemini workflow remains the intended voice path.
+- Awaiting the first complete rendered artifact and inspection of its frames/metadata before claiming the new visual approach works end-to-end.
