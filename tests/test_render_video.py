@@ -25,14 +25,14 @@ class RendererTests(unittest.TestCase):
         for key in ("narration", "title", "visual", "action", "mood", "props"):
             self.assertIn(key, scene)
         frame = MODULE.draw_scene(scene, 0, 0.5, 5.0, scene["narration"])
-        self.assertEqual(frame.size, (1920, 1080))
+        self.assertEqual(frame.size, (960, 540))
         self.assertEqual(frame.mode, "RGB")
 
     def test_illustrated_scene_uses_distinct_camera_framing(self):
         scene = MODULE.load_scenes("The detective examined the evidence folder in the investigation room.")[0]
         wide = MODULE.draw_scene(scene, 0, 0.5, 5.0, "")
         close = MODULE.draw_scene(scene, 2, 0.5, 5.0, "")
-        self.assertEqual(wide.size, (1920, 1080))
+        self.assertEqual(wide.size, (960, 540))
         self.assertIsNotNone(ImageChops.difference(wide, close).getbbox())
 
     def test_renderer_exposes_reference_style_features(self):
