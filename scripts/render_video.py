@@ -324,7 +324,7 @@ def draw_scene(scene,index,t,duration,caption):
         rounded(d,(55,y-8,905,SH-12),8,(15,17,19),(15,17,19),1)
         for j,txt in enumerate(lines):
             d.text((SW//2,y+j*23),txt,font=font(17,True),fill=(250,248,239),anchor="ma")
-    return im.resize((W,H),Image.Resampling.LANCZOS)
+    return im
 def main():
     ap=argparse.ArgumentParser()
     ap.add_argument("--narration",required=True,type=Path); ap.add_argument("--voice",required=True,type=Path)
@@ -359,7 +359,7 @@ def main():
             ffmpeg_bin=imageio_ffmpeg.get_ffmpeg_exe()
         except ImportError as exc:
             raise RuntimeError("FFmpeg is missing. Install imageio-ffmpeg or provide ffmpeg on PATH.") from exc
-    cmd=[ffmpeg_bin,"-y","-f","rawvideo","-pix_fmt","rgb24","-s",f"{W}x{H}","-r",str(FPS),"-i","-","-i",str(args.voice),"-i",str(args.music),"-i",str(args.sfx),"-filter_complex","[2:a]volume=0.24[bed];[bed][1:a]sidechaincompress=threshold=0.025:ratio=8:attack=20:release=550[ducked];[3:a]volume=0.55[sfx];[1:a][ducked][sfx]amix=inputs=3:duration=first:dropout_transition=2:normalize=0,alimiter=limit=0.95[aout]","-map","0:v:0","-map","[aout]","-c:v","libx264","-preset","ultrafast","-crf","22","-pix_fmt","yuv420p","-c:a","aac","-b:a","192k","-shortest","-movflags","+faststart",str(args.output)]
+    cmd=[ffmpeg_bin,"-y","-f","rawvideo","-pix_fmt","rgb24","-s",f"{SW}x{SH}","-r",str(FPS),"-i","-","-i",str(args.voice),"-i",str(args.music),"-i",str(args.sfx),"-filter_complex","[2:a]volume=0.24[bed];[bed][1:a]sidechaincompress=threshold=0.025:ratio=8:attack=20:release=550[ducked];[3:a]volume=0.55[sfx];[1:a][ducked][sfx]amix=inputs=3:duration=first:dropout_transition=2:normalize=0,alimiter=limit=0.95[aout]","-map","0:v:0","-s:v",f"{W}x{H}","-map","[aout]","-c:v","libx264","-preset","ultrafast","-crf","22","-pix_fmt","yuv420p","-c:a","aac","-b:a","192k","-shortest","-movflags","+faststart",str(args.output)]
     proc=subprocess.Popen(cmd,stdin=subprocess.PIPE); scene_index=0; boundaries=[]; c=0
     for dur in durations: c+=dur; boundaries.append(c)
     try:
