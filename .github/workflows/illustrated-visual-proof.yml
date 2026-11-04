@@ -1,8 +1,6 @@
 name: Build illustrated visual proof
 
 on:
-  push:
-    branches: [reference-style-animation]
   workflow_dispatch:
 
 permissions:
