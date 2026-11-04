@@ -177,18 +177,20 @@ def draw_character(d,cx,base,scale,t,action,mood,variant=0,close=False):
     d.polygon([P(-2,-bodyh*.68),P(3,-bodyh*.68),P(5,-bodyh*.35),P(0,-bodyh*.29),P(-4,-bodyh*.35)],fill=(76,45,42),outline=ink)
     # arms with animated gestures
     shoulder=P(-19,-bodyh*.68); shoulder2=P(19,-bodyh*.68)
+    gesture=math.sin(t*4.2+variant*.7)
     if action in ("speaking or arguing","discovering or revealing"):
-        left=P(-42,-bodyh*.48); left2=P(-52,-bodyh*.58)
-        right=P(42,-bodyh*.50); right2=P(56,-bodyh*.65+math.sin(t*4)*4)
-    elif action in ("running","fighting"):
-        left=P(-42,-bodyh*.75); left2=P(-50,-bodyh*.94)
-        right=P(42,-bodyh*.45); right2=P(52,-bodyh*.32)
+        left=P(-42,-bodyh*.48+gesture*5); left2=P(-52-gesture*7,-bodyh*.58+math.cos(t*4.2+variant)*10)
+        right=P(42,-bodyh*.50-gesture*4); right2=P(56+gesture*9,-bodyh*.65+math.sin(t*4)*13)
+    elif action in ("running","walking or travelling","fighting"):
+        left=P(-42,-bodyh*.75+stride*.35); left2=P(-50,-bodyh*.94+stride*.65)
+        right=P(42,-bodyh*.45-stride*.35); right2=P(52,-bodyh*.32-stride*.65)
     elif action in ("opening or unlocking","picking up or collecting","reaching or handing over"):
         left=P(-39,-bodyh*.45); left2=P(-47,-bodyh*.36)
         right=P(48,-bodyh*.58); right2=P(65,-bodyh*.50)
     else:
-        left=P(-37,-bodyh*.42); left2=P(-38,-bodyh*.25)
-        right=P(37,-bodyh*.42); right2=P(39,-bodyh*.25)
+        sway=math.sin(t*2.3+variant)*4
+        left=P(-37,-bodyh*.42+sway); left2=P(-38,-bodyh*.25+sway*1.4)
+        right=P(37,-bodyh*.42-sway); right2=P(39,-bodyh*.25-sway*1.4)
     for a,b in ((shoulder,left),(left,left2),(shoulder2,right),(right,right2)):
         inkline(d,[a,b],coat,max(5,int(12*scale)))
         inkline(d,[a,b],ink,max(2,int(3*scale)))
@@ -222,15 +224,21 @@ def draw_character(d,cx,base,scale,t,action,mood,variant=0,close=False):
     else:
         inkline(d,[(cx-eye_dx-4*scale,eye_y-7*scale),(cx-eye_dx+4*scale,eye_y-7*scale)],ink,max(1,int(2*scale)))
         inkline(d,[(cx+eye_dx-4*scale,eye_y-7*scale),(cx+eye_dx+4*scale,eye_y-7*scale)],ink,max(1,int(2*scale)))
-    ellipse(d,(cx-eye_dx-3*scale,eye_y-2*scale,cx-eye_dx+3*scale,eye_y+5*scale),ink,ink,1)
-    ellipse(d,(cx+eye_dx-3*scale,eye_y-2*scale,cx+eye_dx+3*scale,eye_y+5*scale),ink,ink,1)
+    blink=(math.sin(t*1.7+variant*2.1)>0.985)
+    if blink:
+        inkline(d,[(cx-eye_dx-4*scale,eye_y+2*scale),(cx-eye_dx+4*scale,eye_y+2*scale)],ink,max(1,int(2*scale)))
+        inkline(d,[(cx+eye_dx-4*scale,eye_y+2*scale),(cx+eye_dx+4*scale,eye_y+2*scale)],ink,max(1,int(2*scale)))
+    else:
+        ellipse(d,(cx-eye_dx-3*scale,eye_y-2*scale,cx-eye_dx+3*scale,eye_y+5*scale),ink,ink,1)
+        ellipse(d,(cx+eye_dx-3*scale,eye_y-2*scale,cx+eye_dx+3*scale,eye_y+5*scale),ink,ink,1)
     inkline(d,[(cx,eye_y+4*scale),(cx-2*scale,eye_y+11*scale),(cx+2*scale,eye_y+12*scale)],(139,111,91),max(1,int(1.5*scale)))
     if mood=="worried":
         d.arc((cx-8*scale,hy+15*scale,cx+8*scale,hy+30*scale),190,345,fill=ink,width=max(1,int(2*scale)))
     elif mood=="happy":
         d.arc((cx-11*scale,hy+9*scale,cx+11*scale,hy+29*scale),0,180,fill=ink,width=max(1,int(3*scale)))
     elif action=="speaking or arguing":
-        ellipse(d,(cx-5*scale,hy+14*scale,cx+5*scale,hy+25*scale),(91,43,42),ink,max(1,int(1*scale)))
+        mouth_open=5+abs(math.sin(t*8+variant))*8
+        ellipse(d,(cx-5*scale,hy+14*scale,cx+5*scale,hy+(14+mouth_open)*scale),(91,43,42),ink,max(1,int(1*scale)))
     else:
         inkline(d,[(cx-7*scale,hy+20*scale),(cx+7*scale,hy+20*scale)],ink,max(1,int(2*scale)))
     # lapel and buttons
