@@ -207,3 +207,10 @@ Never confuse a successful static-site deployment with a finished video generato
 - Removed the package-manager dependency from the visual proof workflow after the hosted runner spent excessive time in apt installation.
 - The proof now uses the runner's FFmpeg and a small deterministic mono test track generated in Python. It validates frame composition, MP4 encoding, scene sequencing and subtitles; it is explicitly not a voice-quality or final audio-mix test.
 - Renderer metadata now describes its audio input generically as a supplied mono narration WAV.
+
+
+## 2026-11-04 — portable FFmpeg resolution
+- The first proof render exposed that FFmpeg is not present on the runner image and the previous apt-based setup was not reliable.
+- Renderer now resolves FFmpeg from PATH or falls back to the bundled executable supplied by `imageio-ffmpeg`.
+- Both visual-proof and manual Charon pilot workflows now install `imageio-ffmpeg` through pip rather than relying on apt mirrors.
+- Awaiting a fresh proof render with the bundled encoder.
