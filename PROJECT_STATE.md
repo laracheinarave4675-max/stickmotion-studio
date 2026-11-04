@@ -168,3 +168,12 @@ Never confuse a successful static-site deployment with a finished video generato
 - The separate Pages/CI run `41736998951` passed JavaScript syntax checks and all 13 Node tests, then failed at Python compilation because `tests/test_render_video.py` contained literal escaped newline sequences between the music and SFX imports.
 - Fixed those separators as real source newlines in commit `6ee782a6a5c8e04a9a4ab002ddc08e6ace8b1628`. CI for this fix must still be checked; do not mark the full CI green until then.
 - Next: user downloads and uploads the MP4 from the successful pilot artifact for frame-by-frame, audio, subtitle and pacing review; independently verify the CI run triggered by the test fix.
+
+
+## 2026-11-04 — reference style approved; visual redesign direction recorded
+- User supplied visual examples from two historical story-animation videos and explicitly approved them as the target for StickMotion Studio.
+- The target is a directed illustrated 2D story documentary: expressive varied characters with clothes and face acting; complete story-specific locations and props; deliberate wide/medium/close-up shot grammar; atmospheric color/light; continuity; and purposeful camera/editing rhythm.
+- The current procedural renderer (single generic figure, simplified background primitives, limited action loops) is not considered close enough to the target. A successful CI/MP4 export is not a quality milestone.
+- Added `docs/REFERENCE_ANIMATION_DIRECTION.md` on branch `reference-style-animation` with the approved art direction, pipeline principles, quality gates, and hybrid illustrated-scene strategy.
+- Next engineering step: inspect the existing renderer and replace the generic composition in bounded stages—first a character/environment asset-composition layer and shot-framing controls, then a short pilot to inspect. If primitive drawing cannot meet the style, change scene construction instead of adding cosmetic effects.
+- Quality gate: user must review the actual rendered video and approve the visual result before scaling to long runtime. No claim of target-level quality is made yet.
