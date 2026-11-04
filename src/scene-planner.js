@@ -1,4 +1,7 @@
 const VISUAL_ORDER = [
+  ["classroom", /\b(classroom|schoolroom|school|teacher|students|lesson|pupils)\b/],
+  ["home", /\b(home|house|houses|bedroom|kitchen|piano|mother|family)\b/],
+  ["village", /\b(village|town|street|market|square|houses)\b/],
   ["historical", /\b(history|historical|ancient|medieval|kingdom|empire|pharaoh|roman|egyptian|viking|castle|knight|dynasty|century|archaeolog|artifact|civilization|revolution)\b/],
   ["crime", /\b(murder|killer|crime|criminal|victim|suspect|homicide|serial|poison|blood|body|dead|death|assassin|robbery|theft|kidnap|missing person)\b/],
   ["investigation", /\b(detective|investigat|evidence|clue|fingerprint|interrogate|witness|case file|forensic|police|crime scene|mystery|questioned)\b/],
@@ -6,7 +9,7 @@ const VISUAL_ORDER = [
   ["desert", /\b(desert|sandstorm|dune|sahara|oasis|scorching|heatwave|camel|arid)\b/],
   ["shipwreck", /\b(shipwreck|ship|sinking|ocean|sea|island|raft|sailor|titanic|drown|storm at sea|castaway)\b/],
   ["wilderness", /\b(forest|jungle|wild|bear|wolf|snake|predator|mountain|cave|river|campfire|hunting|tracking)\b/],
-  ["war", /\b(war|battle|soldier|army|weapon|siege|frontline|invasion|bomb|trench|general|combat|military)\b/],
+  ["war", /\b(war|battle|soldiers?|army|weapon|siege|frontline|invasion|bomb|trench|general|combat|military|march)\b/],
   ["disaster", /\b(disaster|earthquake|flood|fire|wildfire|hurricane|tsunami|volcano|collapse|explosion|crash|catastrophe)\b/],
   ["survival", /\b(surviv|stranded|alone|starv|thirst|shelter|ration|rescue|lost|wilderness|escape|trapped|endure)\b/],
   ["night", /\b(dark|darkness|night|shadow|afraid|fear|scared|haunted|lights? (?:go|went) out)\b/],
@@ -52,7 +55,7 @@ const ACTION_RULES = [
 ];
 
 const SETTING_LABELS = {
-  historical: "historical location or period setting", crime: "crime scene",
+  classroom: "period classroom with desks and chalkboard", home: "warm family home interior", village: "historical village street", historical: "historical location or period setting", crime: "crime scene",
   investigation: "detective investigation room", prison: "prison cell or corridor",
   desert: "open desert landscape", shipwreck: "open sea and damaged vessel",
   wilderness: "remote wilderness", war: "battlefield", disaster: "disaster-affected location",
